@@ -1,3 +1,7 @@
+using Microsoft.EntityFrameworkCore;
+using WorkshopManager.Data;
+using WorkshopManager.Models;
+
 namespace WorkshopManager
 {
     public class Program
@@ -8,8 +12,15 @@ namespace WorkshopManager
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
+            builder.Services.AddDbContext<UsersDbContext>(options => options.UseSqlite("Data Source=database.db"));
 
             var app = builder.Build();
+
+            using (var scope = app.Services.CreateScope())
+            {
+                var usersContext = scope.ServiceProvider.GetRequiredService<UsersDbContext>();
+                usersContext.Database.EnsureCreated();
+            }
 
             // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())
