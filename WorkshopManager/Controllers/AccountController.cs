@@ -17,7 +17,11 @@ namespace WorkshopManager.Controllers
         }
 
         [HttpGet]
-        public IActionResult Login() => View();
+        public IActionResult Login()
+        {
+            var model = new LoginViewModel();
+            return View(model);
+        }
 
         [HttpPost]
         public async Task<IActionResult> Login(LoginViewModel model)

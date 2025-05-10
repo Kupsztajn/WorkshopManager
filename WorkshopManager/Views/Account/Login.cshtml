@@ -1,0 +1,11 @@
+﻿@model WorkshopManager.Models.ViewModels.LoginViewModel
+
+<form asp-action="Login" method="post">
+	<input asp-for="Username" class="form-control" />
+	<span asp-validation-for="Username" class="text-danger"></span>
+
+	<input asp-for="Password" type="password" class="form-control" />
+	<span asp-validation-for="Password" class="text-danger"></span>
+
+	<button type="submit">Zaloguj</button>
+</form>

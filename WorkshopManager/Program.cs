@@ -1,6 +1,8 @@
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using WorkshopManager.Data;
 using WorkshopManager.Models;
+using WorkshopManager.Services;
 
 namespace WorkshopManager
 {
@@ -13,7 +15,9 @@ namespace WorkshopManager
             // Add services to the container.
             builder.Services.AddControllersWithViews();
             builder.Services.AddDbContext<UsersDbContext>(options => options.UseSqlite("Data Source=database.db"));
-
+            builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+                .AddCookie(options => { options.LoginPath = "/Account/Login"; });
+            builder.Services.AddScoped<IUserService, UserService>();
             var app = builder.Build();
 
             using (var scope = app.Services.CreateScope())
