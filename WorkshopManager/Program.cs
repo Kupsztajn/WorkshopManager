@@ -14,7 +14,11 @@ namespace WorkshopManager
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
-            builder.Services.AddDbContext<UsersDbContext>(options => options.UseSqlite("Data Source=database.db"));
+            //builder.Services.AddDbContext<UsersDbContext>(options => options.UseSqlite("Data Source=database.db"));
+            
+            builder.Services.AddDbContext<UsersDbContext>(options =>
+                options.UseSqlServer("Server=localhost;Database=DbWorkshop;Trusted_Connection=True;TrustServerCertificate=True;"));
+            
             builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                 .AddCookie(options => { options.LoginPath = "/Account/Login"; });
             builder.Services.AddScoped<IUserService, UserService>();
