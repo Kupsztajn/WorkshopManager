@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using WorkshopManager.Data;
 using WorkshopManager.Models;
@@ -6,9 +7,54 @@ using WorkshopManager.Services;
 
 namespace WorkshopManager
 {
+    
+    
     public class Program
     {
-        public static void Main(string[] args)
+
+        public static async Task SeedUsersAsync(WebApplication app)
+        {
+            using var scope = app.Services.CreateScope();
+
+            var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+            var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+
+            // Utwórz role jeśli nie istnieją
+            string[] roles = new[] { "Admin", "Mechanik", "Recepcjonista" };
+            foreach (var role in roles)
+            {
+                if (!await roleManager.RoleExistsAsync(role))
+                    await roleManager.CreateAsync(new IdentityRole(role));
+            }
+
+            // Utwórz użytkownika admin jeśli nie istnieje
+            var adminEmail = "admin@warsztat.pl";
+            var adminUser = await userManager.FindByEmailAsync(adminEmail);
+            if (adminUser == null)
+            {
+                adminUser = new ApplicationUser
+                {
+                    UserName = adminEmail,
+                    Email = adminEmail,
+                    Name = "Admin",
+                    Surname = "User",
+                    EmailConfirmed = true
+                };
+
+                var result = await userManager.CreateAsync(adminUser, "Admin123!");  // Hasło jawne - zostanie zahashowane
+
+                if (result.Succeeded)
+                {
+                    await userManager.AddToRoleAsync(adminUser, "Admin");
+                }
+                else
+                {
+                    // Tutaj możesz logować błędy tworzenia użytkownika
+                    throw new Exception("Failed to create admin user: " + string.Join(", ", result.Errors.Select(e => e.Description)));
+                }
+            }
+        }
+        public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
 
@@ -19,11 +65,29 @@ namespace WorkshopManager
             builder.Services.AddDbContext<UsersDbContext>(options =>
                 options.UseSqlServer("Server=localhost;Database=DbWorkshop;Trusted_Connection=True;TrustServerCertificate=True;"));
             
-            builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-                .AddCookie(options => { options.LoginPath = "/Account/Login"; });
-            builder.Services.AddScoped<IUserService, UserService>();
-            var app = builder.Build();
+            //builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+                //.AddCookie(options => { options.LoginPath = "/Account/Login"; });
+            builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+                {
+                    options.Password.RequireDigit = false;
+                    options.Password.RequiredLength = 6;
+                    options.Password.RequireNonAlphanumeric = false;
+                    options.Password.RequireUppercase = false;
+                    options.Password.RequireLowercase = false;
+                })
+                .AddEntityFrameworkStores<UsersDbContext>()
+                .AddDefaultTokenProviders();
 
+            builder.Services.ConfigureApplicationCookie(options =>
+            {
+                options.LoginPath = "/Account/Login";
+            });
+            
+            var app = builder.Build();
+            
+            await SeedUsersAsync(app);
+
+            
             using (var scope = app.Services.CreateScope())
             {
                 var usersContext = scope.ServiceProvider.GetRequiredService<UsersDbContext>();

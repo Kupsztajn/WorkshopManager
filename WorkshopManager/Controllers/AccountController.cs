@@ -1,26 +1,25 @@
-﻿using System.Security.Claims;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using WorkshopManager.Models.ViewModels;
-using WorkshopManager.Services;
+using WorkshopManager.Models;
+using WorkshopManager.Models.ViewModels; // LoginViewModel
 
 namespace WorkshopManager.Controllers
 {
     public class AccountController : Controller
     {
-        private readonly IUserService _userService; // your own user check logic
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly SignInManager<ApplicationUser> _signInManager;
 
-        public AccountController(IUserService userService)
+        public AccountController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager)
         {
-            _userService = userService;
+            _userManager = userManager;
+            _signInManager = signInManager;
         }
 
         [HttpGet]
         public IActionResult Login()
         {
-            var model = new LoginViewModel();
-            return View(model);
+            return View(new LoginViewModel());
         }
 
         [HttpPost]
@@ -29,31 +28,22 @@ namespace WorkshopManager.Controllers
             if (!ModelState.IsValid)
                 return View(model);
 
-            var user = await _userService.Authenticate(model.Username, model.Password);
-            if (user == null)
+            var result = await _signInManager.PasswordSignInAsync(model.Username, model.Password, isPersistent: false, lockoutOnFailure: false);
+
+            if (result.Succeeded)
             {
-                ModelState.AddModelError("", "Invalid username or password");
-                return View(model);
+                return RedirectToAction("Index", "Home");
             }
 
-            var claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.Name, user.Login),
-                // Add more claims if needed
-            };
-
-            var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-            var principal = new ClaimsPrincipal(identity);
-            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
-
-            return RedirectToAction("Index", "Home");
+            ModelState.AddModelError("", "Invalid username or password");
+            return View(model);
         }
 
+        [HttpPost]
         public async Task<IActionResult> Logout()
         {
-            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            await _signInManager.SignOutAsync();
             return RedirectToAction("Login");
         }
     }
-
 }
