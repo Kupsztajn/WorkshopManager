@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System.Security.Claims;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using WorkshopManager.Models;
@@ -54,7 +56,8 @@ namespace WorkshopManager.Controllers
             else
             {
                 TempData["ErrorMessage"] = "Nie udało się dodać użytkownika: " + string.Join(", ", result.Errors.Select(e => e.Description));
-                return RedirectToAction("AddReceptionist", model); // lub po prostu View(model)
+                return View(model);
+                // lub po prostu View(model)
             }
 
             foreach (var error in result.Errors)
@@ -64,5 +67,13 @@ namespace WorkshopManager.Controllers
         }
         
         // podobnie dodasz AddMechanic
+        
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Logout()
+        {
+            await HttpContext.SignOutAsync();
+            return RedirectToAction("Login", "Account");
+        }
     }
 }

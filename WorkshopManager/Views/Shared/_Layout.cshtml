@@ -7,6 +7,8 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/WorkshopManager.styles.css" asp-append-version="true" />
+    
+    
 </head>
 <body>
     <header>
@@ -26,6 +28,12 @@
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
                         </li>
                     </ul>
+
+                    <form asp-controller="Account" asp-action="Logout" method="post" style="display:inline;">
+                        <button type="submit" class="btn btn-link nav-link">Wyloguj się</button>
+                        @Html.AntiForgeryToken()
+                    </form>
+                    
                 </div>
             </div>
         </nav>
