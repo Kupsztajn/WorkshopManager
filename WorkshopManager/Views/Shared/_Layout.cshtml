@@ -33,13 +33,8 @@
 
                         </li>
                         
-                        @if (!SignInManager.IsSignedIn(User))
-                        {
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-controller="Account" asp-action="Login">Zaloguj się</a>
-                            </li>
-                        }
-                        else
+
+                        @if(SignInManager.IsSignedIn(User))
                         {
                             
                                 string panelController = null;
@@ -55,12 +50,31 @@
                                 </li>
                             }
                         }
-                        
                     </ul>
-
+                    
+                    
                     <form asp-controller="Account" asp-action="Logout" method="post" style="display:inline;">
-                        <button type="submit" class="btn btn-link nav-link">Wyloguj się</button>
-                        @Html.AntiForgeryToken()
+                        
+                        @if (!SignInManager.IsSignedIn(User))
+                        {
+                            <a class="btn btn-link nav-link" asp-controller="Account" asp-action="Login">Zaloguj się</a>
+
+                        }
+                        else
+                        {
+                            
+                            string panelController = null;
+                            if (User.IsInRole("Admin"))            panelController = "Admin";
+                            else if (User.IsInRole("Mechanik"))     panelController = "Mechanik";
+                            else if (User.IsInRole("Recepcjonista"))panelController = "Recepcjonista";
+                            else if (User.IsInRole("Klient"))       panelController = "Klient";
+                            
+                            @if (panelController != null)
+                            {
+                                <button type="submit" class="btn btn-link nav-link">Wyloguj się</button>
+                                @Html.AntiForgeryToken()
+                            }
+                        }
                     </form>
 
                 </div>
