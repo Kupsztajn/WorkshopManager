@@ -1,2 +1,8 @@
-﻿<h2>Panel Klienta</h2>
-<p>Witaj w panelu klienta!</p>
+﻿@{
+    Layout = "_Layout"; // jeśli używasz layoutu
+    var firstName = ViewBag.FirstName as string;
+}
+
+<h2>Panel Klienta (@firstName)</h2>
+
+<p>Witaj, @firstName! Tutaj możesz zarządzać swoimi zamówieniami.</p>
