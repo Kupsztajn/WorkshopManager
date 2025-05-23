@@ -1,8 +1,17 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@using Microsoft.AspNetCore.Identity
+@inject SignInManager<ApplicationUser> SignInManager
+
+@{
+    ViewData["Title"] = "Home";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<h1>Witamy w Workshop Manager!</h1>
+<p>Tu możesz zarządzać swoim warsztatem samochodowym.</p>
+
+@if (!SignInManager.IsSignedIn(User))
+{
+    <div class="mb-4 text-center">
+        <a class="btn btn-primary me-2" asp-controller="Account" asp-action="Login">Zaloguj się</a>
+        <a class="btn btn-outline-primary" asp-controller="Account" asp-action="Register">Zarejestruj się</a>
+    </div>
+}
