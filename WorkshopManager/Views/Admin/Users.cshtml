@@ -1,0 +1,27 @@
+﻿@model List<ApplicationUser>
+
+<h2>Lista użytkowników</h2>
+
+<table class="table">
+    <thead>
+    <tr>
+        <th>Email</th>
+        <th>Imię</th>
+        <th>Nazwisko</th>
+        <th>Akcje</th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var user in Model)
+    {
+        <tr>
+            <td>@user.Email</td>
+            <td>@user.Name</td>
+            <td>@user.Surname</td>
+            <td>
+                <a asp-action="EditUserRoles" asp-route-userId="@user.Id" class="btn btn-sm btn-primary">Edytuj role</a>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>
