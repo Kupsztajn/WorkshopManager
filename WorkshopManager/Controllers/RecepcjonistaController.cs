@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using WorkshopManager.Data;
 using WorkshopManager.Models;
+using WorkshopManager.Models.ViewModels;
 
 namespace WorkshopManager.Controllers;
 
@@ -40,30 +41,33 @@ public class RecepcjonistaController : Controller
     // POST: Recepcjonista/AddClient
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> AddClient(Client model)
+    public async Task<IActionResult> AddClient(RegisterViewModel model)
     {
         ModelState.Remove("AddedByUserId");
         ModelState.Remove("AddedByUser");
 
         if (!ModelState.IsValid)
-        {
-            // Zbierz wszystkie komunikaty błędów
-            var errors = ModelState.Values
-                .SelectMany(v => v.Errors)
-                .Select(e => e.ErrorMessage)
-                .ToList();
-            // Przekaż je do widoku przez ViewBag
-            ViewBag.Errors = errors;
             return View(model);
+
+        var user = new ApplicationUser
+        {
+            UserName = model.Email,
+            Email = model.Email,
+            Name = model.Name,
+            Surname = model.Surname,
+            EmailConfirmed = true
+        };
+
+        var result = await _userManager.CreateAsync(user, model.Password);
+        if (result.Succeeded)
+        {
+            await _userManager.AddToRoleAsync(user, "Klient");
+            return RedirectToAction("Index"); // lub inna akcja
         }
 
-        var user = await _userManager.GetUserAsync(User);
-        model.AddedByUserId = user.Id;
-        
-        _context.Clients.Add(model);
-        await _context.SaveChangesAsync();
+        foreach (var error in result.Errors)
+            ModelState.AddModelError("", error.Description);
 
-        // Po dodaniu klienta możesz przekierować do listy klientów lub panelu
-        return RedirectToAction("Index");
+        return View(model);
     }
 }
