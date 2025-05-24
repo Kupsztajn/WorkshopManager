@@ -110,13 +110,29 @@ namespace WorkshopManager.Controllers
         }
         
         // GET: /Admin/Users
-        public IActionResult Users()
+        public async Task<IActionResult> Users()
         {
             var users = _userManager.Users.ToList();
-            return View(users);
+
+            var usersWithRoles = new List<UserWithRolesViewModel>();
+
+            foreach (var user in users)
+            {
+                var roles = await _userManager.GetRolesAsync(user);
+                usersWithRoles.Add(new UserWithRolesViewModel
+                {
+                    Id = user.Id,
+                    Email = user.Email,
+                    Name = user.Name,
+                    Surname = user.Surname,
+                    Roles = roles.ToList()  // lista ról użytkownika
+                });
+            }
+
+            return View(usersWithRoles);
         }
 
-
+        
         // GET: /Admin/EditUserRoles/{userId}
         public async Task<IActionResult> EditUserRoles(string userId)
         {
