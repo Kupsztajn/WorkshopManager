@@ -6,7 +6,8 @@ public class EditUserRolesViewModel
 {
     public string UserId { get; set; }
     public string Email { get; set; }
-    public List<RoleSelection> Roles { get; set; }
+    public string SelectedRole { get; set; } // jedna wybrana rola
+    public List<string> AllRoles { get; set; } // lista dostępnych ról
 }
 
 public class RoleSelection

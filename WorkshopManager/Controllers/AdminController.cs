@@ -120,12 +120,8 @@ namespace WorkshopManager.Controllers
         // GET: /Admin/EditUserRoles/{userId}
         public async Task<IActionResult> EditUserRoles(string userId)
         {
-            if (string.IsNullOrEmpty(userId))
-                return NotFound();
-
             var user = await _userManager.FindByIdAsync(userId);
-            if (user == null)
-                return NotFound();
+            if (user == null) return NotFound();
 
             var userRoles = await _userManager.GetRolesAsync(user);
             var allRoles = _roleManager.Roles.Select(r => r.Name).ToList();
@@ -134,11 +130,8 @@ namespace WorkshopManager.Controllers
             {
                 UserId = user.Id,
                 Email = user.Email,
-                Roles = allRoles.Select(role => new RoleSelection
-                {
-                    RoleName = role,
-                    Selected = userRoles.Contains(role)
-                }).ToList()
+                SelectedRole = userRoles.FirstOrDefault(),
+                AllRoles = allRoles
             };
 
             return View(model);
@@ -148,27 +141,27 @@ namespace WorkshopManager.Controllers
         public async Task<IActionResult> EditUserRoles(EditUserRolesViewModel model)
         {
             ModelState.Remove("Email");
+            ModelState.Remove("AllRoles");
             if (!ModelState.IsValid)
-                return View(model);
-
-            var user = await _userManager.FindByIdAsync(model.UserId);
-            if (user == null)
-                return NotFound();
-
-            var userRoles = await _userManager.GetRolesAsync(user);
-
-            var rolesToAdd = model.Roles.Where(r => r.Selected && !userRoles.Contains(r.RoleName)).Select(r => r.RoleName);
-            var rolesToRemove = userRoles.Where(r => !model.Roles.Any(mr => mr.RoleName == r && mr.Selected));
-
-            var addResult = await _userManager.AddToRolesAsync(user, rolesToAdd);
-            var removeResult = await _userManager.RemoveFromRolesAsync(user, rolesToRemove);
-
-            if (!addResult.Succeeded || !removeResult.Succeeded)
             {
-                ModelState.AddModelError("", "Nie udało się zmienić ról użytkownika");
                 return View(model);
             }
 
+            var user = await _userManager.FindByIdAsync(model.UserId);
+            if (user == null) return NotFound();
+
+            var userRoles = await _userManager.GetRolesAsync(user);
+            await _userManager.RemoveFromRolesAsync(user, userRoles);
+
+            if (!string.IsNullOrEmpty(model.SelectedRole))
+            {
+                var result = await _userManager.AddToRoleAsync(user, model.SelectedRole);
+                if (!result.Succeeded)
+                {
+                    ModelState.AddModelError("", "Nie udało się przypisać roli.");
+                    return View(model);
+                }
+            }
             return RedirectToAction(nameof(Users));
         }
         
