@@ -2,7 +2,8 @@
 
 <form asp-action="Login" method="post">
     <div asp-validation-summary="All" class="text-danger"></div>
-    
+    <a asp-controller="Account" asp-action="Register">Zarejestruj się</a>
+
     <div>
         <label asp-for="Username"></label>
         <input asp-for="Username" />

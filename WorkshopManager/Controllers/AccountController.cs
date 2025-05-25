@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using WorkshopManager.Models;
 using WorkshopManager.Models.ViewModels; // LoginViewModel
@@ -32,16 +33,78 @@ namespace WorkshopManager.Controllers
 
             if (result.Succeeded)
             {
-                if (User.IsInRole("Admin"))
-                    return RedirectToAction("Index", "Admin");
-                else
-                    return RedirectToAction("Index", "Home");
+                // Tutaj przekierowujesz po zalogowaniu
+                return RedirectToAction("RedirectAfterLogin");
             }
 
             ModelState.AddModelError("", "Invalid username or password");
             return View(model);
         }
+        
+        [HttpGet]
+        public IActionResult Register()
+        {
+            return View();
+        }
+        
+        [HttpPost]
+        public async Task<IActionResult> Register(RegisterViewModel model)
+        {
+            if (!ModelState.IsValid)
+                return View(model);
 
+            var user = new ApplicationUser 
+            {
+                UserName = model.Email,
+                Email = model.Email,
+                Name = model.Name,
+                Surname = model.Surname,
+                EmailConfirmed = true
+            };
+
+            var result = await _userManager.CreateAsync(user, model.Password);
+            if (result.Succeeded)
+            {
+                var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+                await _userManager.AddToRoleAsync(user, model.Role);
+                await _signInManager.SignInAsync(user, isPersistent: false);
+                return RedirectToAction("RedirectAfterLogin");
+            }
+            else
+            {
+                foreach (var error in result.Errors)
+                    ModelState.AddModelError("", error.Description);
+                return View(model); // Pokaż widok z błędami
+                
+            }
+            foreach (var error in result.Errors)
+                ModelState.AddModelError("", error.Description);
+
+            return View(model);
+            //return RedirectToAction("Index", "Home");
+        }
+    
+        [Authorize]
+        public async Task<IActionResult> RedirectAfterLogin()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            var roles = await _userManager.GetRolesAsync(user);
+
+            if (roles.Contains("Admin"))
+                return RedirectToAction("Index", "Admin");
+
+            if (roles.Contains("Mechanik"))
+                return RedirectToAction("Index", "Mechanik");
+
+            if (roles.Contains("Recepcjonista"))
+                return RedirectToAction("Index", "Recepcjonista");
+
+            if (roles.Contains("Klient"))
+                return RedirectToAction("Index", "Klient");
+
+            return RedirectToAction("Index", "Home");
+        }
+        
         [HttpPost]
         public async Task<IActionResult> Logout()
         {

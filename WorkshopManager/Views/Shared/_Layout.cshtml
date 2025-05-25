@@ -1,4 +1,10 @@
-﻿<!DOCTYPE html>
+﻿@using Microsoft.AspNetCore.Identity
+@using WorkshopManager.Models
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -14,6 +20,7 @@
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container-fluid">
+                
                 <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">WorkshopManager</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
@@ -23,17 +30,53 @@
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                    </ul>
 
-                    <form asp-controller="Account" asp-action="Logout" method="post" style="display:inline;">
-                        <button type="submit" class="btn btn-link nav-link">Wyloguj się</button>
-                        @Html.AntiForgeryToken()
-                    </form>
+                        </li>
+                        
+
+                        @if(SignInManager.IsSignedIn(User))
+                        {
+                            
+                                string panelController = null;
+                                if (User.IsInRole("Admin"))            panelController = "Admin";
+                                else if (User.IsInRole("Mechanik"))     panelController = "Mechanik";
+                                else if (User.IsInRole("Recepcjonista"))panelController = "Recepcjonista";
+                                else if (User.IsInRole("Klient"))       panelController = "Klient";
+                            
+                            @if (panelController != null)
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-controller="@panelController" asp-action="Index">Panel</a>
+                                </li>
+                            }
+                        }
+                    </ul>
                     
+                    
+                    <form asp-controller="Account" asp-action="Logout" method="post" style="display:inline;">
+                        
+                        @if (!SignInManager.IsSignedIn(User))
+                        {
+                            <a class="btn btn-link nav-link" asp-controller="Account" asp-action="Login">Zaloguj się</a>
+
+                        }
+                        else
+                        {
+                            
+                            string panelController = null;
+                            if (User.IsInRole("Admin"))            panelController = "Admin";
+                            else if (User.IsInRole("Mechanik"))     panelController = "Mechanik";
+                            else if (User.IsInRole("Recepcjonista"))panelController = "Recepcjonista";
+                            else if (User.IsInRole("Klient"))       panelController = "Klient";
+                            
+                            @if (panelController != null)
+                            {
+                                <button type="submit" class="btn btn-link nav-link">Wyloguj się</button>
+                                @Html.AntiForgeryToken()
+                            }
+                        }
+                    </form>
+
                 </div>
             </div>
         </nav>

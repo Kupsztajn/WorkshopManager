@@ -12,10 +12,11 @@ namespace WorkshopManager.Controllers
     public class AdminController : Controller
     {
         private readonly UserManager<ApplicationUser> _userManager;
-
-        public AdminController(UserManager<ApplicationUser> userManager)
+        private readonly RoleManager<IdentityRole> _roleManager;
+        public AdminController(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
         {
             _userManager = userManager;
+            _roleManager = roleManager;
         }
         
         [HttpGet]
@@ -67,6 +68,78 @@ namespace WorkshopManager.Controllers
         }
         
         // podobnie dodasz AddMechanic
+        
+        // GET: /Admin/Users
+        public async Task<IActionResult> Users()
+        {
+            var users = _userManager.Users.ToList();
+
+            var usersWithRoles = new List<UserWithRolesViewModel>();
+
+            foreach (var user in users)
+            {
+                var roles = await _userManager.GetRolesAsync(user);
+                usersWithRoles.Add(new UserWithRolesViewModel
+                {
+                    Id = user.Id,
+                    Email = user.Email,
+                    Name = user.Name,
+                    Surname = user.Surname,
+                    Roles = roles.ToList()  // lista ról użytkownika
+                });
+            }
+
+            return View(usersWithRoles);
+        }
+
+        
+        // GET: /Admin/EditUserRoles/{userId}
+        public async Task<IActionResult> EditUserRoles(string userId)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null) return NotFound();
+
+            var userRoles = await _userManager.GetRolesAsync(user);
+            var allRoles = _roleManager.Roles.Select(r => r.Name).ToList();
+
+            var model = new EditUserRolesViewModel
+            {
+                UserId = user.Id,
+                Email = user.Email,
+                SelectedRole = userRoles.FirstOrDefault(),
+                AllRoles = allRoles
+            };
+
+            return View(model);
+        }
+        // POST: /Admin/EditUserRoles
+        [HttpPost]
+        public async Task<IActionResult> EditUserRoles(EditUserRolesViewModel model)
+        {
+            ModelState.Remove("Email");
+            ModelState.Remove("AllRoles");
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            var user = await _userManager.FindByIdAsync(model.UserId);
+            if (user == null) return NotFound();
+
+            var userRoles = await _userManager.GetRolesAsync(user);
+            await _userManager.RemoveFromRolesAsync(user, userRoles);
+
+            if (!string.IsNullOrEmpty(model.SelectedRole))
+            {
+                var result = await _userManager.AddToRoleAsync(user, model.SelectedRole);
+                if (!result.Succeeded)
+                {
+                    ModelState.AddModelError("", "Nie udało się przypisać roli.");
+                    return View(model);
+                }
+            }
+            return RedirectToAction(nameof(Users));
+        }
         
         [HttpPost]
         [ValidateAntiForgeryToken]

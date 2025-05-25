@@ -1,0 +1,30 @@
+﻿@model WorkshopManager.Models.ViewModels.EditUserRolesViewModel
+
+<h2>Edytuj role użytkownika: @Model.Email</h2>
+
+<form method="post" asp-action="EditUserRoles">
+    <input type="hidden" asp-for="UserId" />
+
+    <div class="form-group">
+        @if (ViewBag.Errors != null)
+        {
+            <div class="alert alert-danger">@ViewBag.Errors</div>
+        }
+        @if (Model.AllRoles != null)
+        {
+            foreach (var role in Model.AllRoles)
+            {
+                <div class="form-check">
+                    <input type="radio" name="SelectedRole" value="@role" @(role == Model.SelectedRole ? "checked" : "")/>
+                    <label>@role</label>
+                </div>
+            }
+        }
+        else
+        {
+            <p>Brak dostępnych ról.</p>
+        }
+    </div>
+
+    <button type="submit" class="btn btn-primary mt-2">Zapisz</button>
+</form>
