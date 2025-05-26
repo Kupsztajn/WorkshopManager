@@ -20,7 +20,7 @@ namespace WorkshopManager
             var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
 
             // Utwórz role jeśli nie istnieją
-            string[] roles = new[] { "Admin", "Mechanik", "Recepcjonista" };
+            string[] roles = new[] { "Admin", "Mechanik", "Recepcjonista", "Klient"};
             foreach (var role in roles)
             {
                 if (!await roleManager.RoleExistsAsync(role))

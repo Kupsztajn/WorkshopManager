@@ -1,0 +1,23 @@
+﻿@model List<WorkshopManager.Models.ApplicationUser>
+
+<h2>Lista klientów</h2>
+
+<table class="table">
+    <thead>
+    <tr>
+        <th>Imię</th>
+        <th>Nazwisko</th>
+        <th>Email</th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var client in Model)
+    {
+        <tr>
+            <td>@client.Name</td>
+            <td>@client.Surname</td>
+            <td>@client.Email</td>
+        </tr>
+    }
+    </tbody>
+</table>

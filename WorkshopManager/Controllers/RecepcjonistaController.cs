@@ -70,4 +70,14 @@ public class RecepcjonistaController : Controller
 
         return View(model);
     }
+    
+    // GET: Recepcjonista/Clients
+    public async Task<IActionResult> Clients()
+    {
+        var clientsIList = await _userManager.GetUsersInRoleAsync("Klient");
+        var clients = clientsIList.ToList();  // Konwersja na List<ApplicationUser>
+        return View(clients);
+
+    }
+
 }
