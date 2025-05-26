@@ -17,6 +17,11 @@
             <td>@client.Name</td>
             <td>@client.Surname</td>
             <td>@client.Email</td>
+            <td>
+                <a asp-controller="Vehicle" asp-action="Add" asp-route-clientId="@client.Id" class="btn btn-sm btn-success">
+                    Dodaj pojazd
+                </a>
+            </td>
         </tr>
     }
     </tbody>

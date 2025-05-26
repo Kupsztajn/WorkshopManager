@@ -11,5 +11,6 @@ namespace WorkshopManager.Data
         // Możesz dodać dodatkowe DbSet<>, np. Klienci, Pojazdy itp.
         //public DbSet<ApplicationUser> Users { get; set; }
         //public DbSet<Client> Clients { get; set; }
+        public DbSet<Vehicle> Vehicles { get; set; }
     }
 }
