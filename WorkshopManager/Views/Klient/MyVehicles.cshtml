@@ -1,0 +1,27 @@
+﻿@model List<WorkshopManager.Models.Vehicle>
+
+<h2>Moje pojazdy</h2>
+
+<table class="table">
+    <thead>
+    <tr>
+        <th>Marka</th>
+        <th>Model</th>
+        <th>VIN</th>
+        <th>Rejestracja</th>
+        <th>Rok</th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var vehicle in Model)
+    {
+        <tr>
+            <td>@vehicle.Brand</td>
+            <td>@vehicle.Model</td>
+            <td>@vehicle.VIN</td>
+            <td>@vehicle.Registration</td>
+            <td>@vehicle.Year</td>
+        </tr>
+    }
+    </tbody>
+</table>

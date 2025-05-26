@@ -1,15 +1,19 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using WorkshopManager.Data;
 using WorkshopManager.Models;
 
 namespace WorkshopManager.Controllers;
 
 public class KlientController : Controller
 {
+    private readonly UsersDbContext _context;
     private readonly UserManager<ApplicationUser> _userManager;
 
-    public KlientController(UserManager<ApplicationUser> userManager)
+    public KlientController(UsersDbContext context, UserManager<ApplicationUser> userManager)
     {
+        _context = context;
         _userManager = userManager;
     }
 
@@ -24,5 +28,16 @@ public class KlientController : Controller
         ViewBag.FirstName = user?.Name;
             
         return View();
+    }
+    
+    public async Task<IActionResult> MyVehicles()
+    {
+        var user = await _userManager.GetUserAsync(User);
+
+        var vehicles = await _context.Vehicles
+            .Where(v => v.ClientId == user.Id)
+            .ToListAsync();
+
+        return View(vehicles);
     }
 }
