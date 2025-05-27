@@ -1,0 +1,14 @@
+﻿@model WorkshopManager.Models.Vehicle
+
+<h2>Szczegóły pojazdu</h2>
+
+<p><strong>Marka:</strong> @Model.Brand</p>
+<p><strong>Model:</strong> @Model.Model</p>
+<p><strong>VIN:</strong> @Model.VIN</p>
+<p><strong>Rejestracja:</strong> @Model.Registration</p>
+<p><strong>Rok:</strong> @Model.Year</p>
+
+@if (!string.IsNullOrEmpty(@Model.ImageUrl))
+{
+    <img src="@Model.ImageUrl" alt="Zdjęcie pojazdu" class="img-thumbnail" style="max-width:400px;" />
+}

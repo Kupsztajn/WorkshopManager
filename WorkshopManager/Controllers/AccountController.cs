@@ -111,5 +111,14 @@ namespace WorkshopManager.Controllers
             await _signInManager.SignOutAsync();
             return RedirectToAction("Login");
         }
+        
+        [HttpGet]
+        public IActionResult AccessDenied(string returnUrl = null)
+        {
+            ViewData["ReturnUrl"] = returnUrl;
+            
+            return View();
+        }
+
     }
 }

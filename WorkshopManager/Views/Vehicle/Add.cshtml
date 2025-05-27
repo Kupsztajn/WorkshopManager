@@ -1,8 +1,7 @@
-﻿@model WorkshopManager.Models.Vehicle
-
+﻿@model WorkshopManager.Models.ViewModels.VehicleUploadViewModel
 <h2>Dodaj pojazd dla klienta</h2>
 
-<form asp-action="Add" method="post">
+<form asp-action="Add" method="post" enctype="multipart/form-data">
     <input type="hidden" asp-for="ClientId" />
 
     <div class="mb-3">
@@ -35,6 +34,12 @@
         <span asp-validation-for="Year" class="text-danger"></span>
     </div>
 
+    <div class="mb-3">
+        <label asp-for="Photo"></label>
+        <input asp-for="Photo" type="file" accept=".png,.jpg,.jpeg" class="form-control" />
+        <span asp-validation-for="Photo" class="text-danger"></span>
+    </div>
+    
     <button type="submit" class="btn btn-primary">Dodaj pojazd</button>
 </form>
 

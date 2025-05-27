@@ -10,6 +10,7 @@
         <th>VIN</th>
         <th>Rejestracja</th>
         <th>Rok</th>
+        <th>Akcje</th>
     </tr>
     </thead>
     <tbody>
@@ -21,6 +22,11 @@
             <td>@vehicle.VIN</td>
             <td>@vehicle.Registration</td>
             <td>@vehicle.Year</td>
+            <td>
+                <a asp-controller="Vehicle" asp-action="Details" asp-route-id="@vehicle.Id" class="btn btn-sm btn-info">
+                    Szczegóły
+                </a>
+            </td>
         </tr>
     }
     </tbody>

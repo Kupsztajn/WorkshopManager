@@ -1,11 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc.ModelBinding;
 
-namespace WorkshopManager.Models;
+namespace WorkshopManager.Models.ViewModels;
 
-public class Vehicle
+public class VehicleUploadViewModel
 {
-    public int Id { get; set; }
-    
     public string Brand { get; set; }        // marka
     public string Model { get; set; }        // model
     public string VIN { get; set; }          // numer VIN
@@ -18,4 +16,5 @@ public class Vehicle
     public ApplicationUser Client { get; set; }  // nawiązanie do klienta (jeśli klient to ApplicationUser)
     
     public string ImageUrl { get; set; }
+    public IFormFile Photo { get; set; }  // tu wczytasz plik z formularza
 }

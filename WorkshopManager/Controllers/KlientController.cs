@@ -23,9 +23,14 @@ public class KlientController : Controller
         // User.Identity.Name to domyślnie UserName/email
         var username = User.Identity.Name;
         var user = await _userManager.FindByNameAsync(username);
+        
+        var roles = await _userManager.GetRolesAsync(user);
+        Console.WriteLine(string.Join(", ", roles));
             
         // Przekazujemy imię do widoku np. przez ViewBag
         ViewBag.FirstName = user?.Name;
+        
+        
             
         return View();
     }

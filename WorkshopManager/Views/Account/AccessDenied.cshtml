@@ -1,0 +1,10 @@
+﻿@{
+    ViewData["Title"] = "Dostęp zabroniony";
+}
+
+<h1>Brak dostępu</h1>
+<p>Nie masz uprawnień do przeglądania tej strony.</p>
+@if (ViewData["ReturnUrl"] != null)
+{
+    <p><a asp-action="Login" asp-controller="Account" asp-route-returnUrl="@ViewData["ReturnUrl"]">Zaloguj się</a>, aby uzyskać dostęp.</p>
+}
