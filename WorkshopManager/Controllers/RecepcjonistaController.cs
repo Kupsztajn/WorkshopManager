@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using WorkshopManager.Data;
 using WorkshopManager.Models;
 using WorkshopManager.Models.ViewModels;
@@ -78,6 +79,22 @@ public class RecepcjonistaController : Controller
         var clients = clientsIList.ToList();  // Konwersja na List<ApplicationUser>
         return View(clients);
 
+    }
+    
+    
+    // GET: /Recepcjonista/ClientVehicles/{clientId}
+    public async Task<IActionResult> ClientVehicles(string clientId)
+    {
+        if (string.IsNullOrEmpty(clientId)) return NotFound();
+        var client = await _userManager.FindByIdAsync(clientId);
+        if (client == null) return NotFound();
+
+        var vehicles = await _context.Vehicles
+            .Where(v => v.ClientId == clientId)
+            .ToListAsync();
+
+        ViewBag.ClientName = client.Name + " " + client.Surname;
+        return View(vehicles);
     }
 
 }

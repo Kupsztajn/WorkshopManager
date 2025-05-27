@@ -22,6 +22,14 @@
                     Dodaj pojazd
                 </a>
             </td>
+
+            <td>
+                <a asp-action="ClientVehicles"
+                   asp-route-clientId="@client.Id"
+                   class="btn btn-sm btn-secondary">
+                    Pojazdy klienta
+                </a>
+            </td>
         </tr>
     }
     </tbody>
