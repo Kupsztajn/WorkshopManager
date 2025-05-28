@@ -1,0 +1,44 @@
+﻿@model List<WorkshopManager.Models.Vehicle>
+@{
+    ViewData["Title"] = "Pojazdy klienta";
+}
+
+<h2>Pojazdy klienta: @ViewBag.ClientName</h2>
+
+<table class="table">
+    <thead>
+    <tr>
+        <th>Marka</th>
+        <th>Model</th>
+        <th>VIN</th>
+        <th>Rejestracja</th>
+        <th>Rok</th>
+        <th>Zdjęcie</th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach(var v in Model)
+    {
+        <tr>
+            <td>@v.Brand</td>
+            <td>@v.Model</td>
+            <td>@v.VIN</td>
+            <td>@v.Registration</td>
+            <td>@v.Year</td>
+            <td>
+                @if(!string.IsNullOrEmpty(v.ImageUrl))
+                {
+                    <img src="~@v.ImageUrl" style="max-height:75px" />
+                }
+            </td>
+
+            <td>
+                <a asp-controller="Vehicle" asp-action="Details" asp-route-id="@v.Id" class="btn btn-sm btn-info">
+                    Szczegóły
+                </a>
+            </td>
+            
+        </tr>
+    }
+    </tbody>
+</table>

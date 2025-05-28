@@ -21,6 +21,18 @@
             <td>
                 <a asp-action="EditUserRoles" asp-route-userId="@user.Id" class="btn btn-sm btn-primary">Edytuj role</a>
             </td>
+            <td>
+            @* tylko dla klientów *@
+            @if (user.Roles.Contains("Klient"))
+            {
+                <a asp-action="ClientVehicles"
+                   asp-controller="Admin"
+                   asp-route-clientId="@user.Id"
+                   class="btn btn-sm btn-secondary ms-1">
+                    Pojazdy klienta
+                </a>
+            }
+            </td>
         </tr>
     }
     </tbody>

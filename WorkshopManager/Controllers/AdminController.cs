@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using WorkshopManager.Data;
 using WorkshopManager.Models;
 using WorkshopManager.Models.ViewModels; // jeśli masz CreateUserViewModel
 
@@ -13,10 +15,12 @@ namespace WorkshopManager.Controllers
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
-        public AdminController(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
+        private readonly UsersDbContext _context;
+        public AdminController(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, UsersDbContext context)
         {
             _userManager = userManager;
             _roleManager = roleManager;
+            _context = context;
         }
         
         [HttpGet]
@@ -139,6 +143,23 @@ namespace WorkshopManager.Controllers
                 }
             }
             return RedirectToAction(nameof(Users));
+        }
+        
+        [HttpGet]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> ClientVehicles(string clientId)
+        {
+            if (string.IsNullOrEmpty(clientId)) return NotFound();
+
+            var client = await _userManager.FindByIdAsync(clientId);
+            if (client == null) return NotFound();
+
+            var vehicles = await _context.Vehicles
+                .Where(v => v.ClientId == clientId)
+                .ToListAsync();
+
+            ViewBag.ClientName = $"{client.Name} {client.Surname}";
+            return View(vehicles);
         }
         
         [HttpPost]
