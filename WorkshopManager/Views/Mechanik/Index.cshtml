@@ -1,8 +1,14 @@
-﻿@{
-    Layout = "_Layout"; // jeśli używasz layoutu
-    var firstName = ViewBag.FirstName as string;
+﻿@*
+  Views/Mechanik/Index.cshtml
+*@
+@{
+    ViewData["Title"] = "Panel Mechanika";
+    var name = ViewBag.FirstName as string ?? "";
 }
+<h2>Panel Mechanika (@name)</h2>
 
-<h2>Panel Mechanika @firstName</h2>
-
-<p>Witaj, @firstName! Tutaj możesz zarządzać swoimi zadaniami.</p>
+<p>
+    <a asp-action="MyOrders" class="btn btn-primary">
+        Zlecenia
+    </a>
+</p>

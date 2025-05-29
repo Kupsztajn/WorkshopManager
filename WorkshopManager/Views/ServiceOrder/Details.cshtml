@@ -2,6 +2,7 @@
 
 @{
     ViewData["Title"] = "Szczegóły zlecenia";
+    bool isMechanic = User.IsInRole("Mechanik");
 }
 
 <h2>@ViewData["Title"] (#@Model.Id)</h2>
@@ -31,6 +32,24 @@
     <span>@Model.CreatedAt.ToLocalTime().ToString("g")</span>
 </div>
 
-<a asp-action="OrdersForVehicle" asp-route-vehicleId="@Model.VehicleId" class="btn btn-secondary">
-    ← Wróć do listy zleceń
-</a>
+<p>
+    @if (isMechanic)
+    {
+        <!-- dla mechanika idź do jego listy zleceń -->
+        <a asp-controller="Mechanik"
+           asp-action="MyOrders"
+           class="btn btn-secondary">
+            ← Wróć do moich zleceń
+        </a>
+    }
+    else
+    {
+        <!-- dla wszystkich innych (recepcjonista, admin) idź do zleceń pojazdu -->
+        <a asp-controller="ServiceOrder"
+           asp-action="OrdersForVehicle"
+           asp-route-vehicleId="@Model.VehicleId"
+           class="btn btn-secondary">
+            ← Wróć do listy zleceń
+        </a>
+    }
+</p>
