@@ -1,0 +1,36 @@
+﻿@model WorkshopManager.Models.ServiceOrder
+
+@{
+    ViewData["Title"] = "Szczegóły zlecenia";
+}
+
+<h2>@ViewData["Title"] (#@Model.Id)</h2>
+
+<div class="mb-3">
+    <label class="form-label"><strong>Pojazd:</strong></label>
+    <span>@Model.Vehicle?.Brand @Model.Vehicle?.Model</span>
+</div>
+<div class="mb-3">
+    <label class="form-label"><strong>VIN:</strong></label>
+    <span>@Model.Vehicle?.VIN</span>
+</div>
+<div class="mb-3">
+    <label class="form-label"><strong>Mechanik:</strong></label>
+    <span>@Model.Mechanic?.Name @Model.Mechanic?.Surname</span>
+</div>
+<div class="mb-3">
+    <label class="form-label"><strong>Status:</strong></label>
+    <span>@Model.Status</span>
+</div>
+<div class="mb-3">
+    <label class="form-label"><strong>Opis:</strong></label>
+    <p>@Model.Description</p>
+</div>
+<div class="mb-3">
+    <label class="form-label"><strong>Data utworzenia:</strong></label>
+    <span>@Model.CreatedAt.ToLocalTime().ToString("g")</span>
+</div>
+
+<a asp-action="OrdersForVehicle" asp-route-vehicleId="@Model.VehicleId" class="btn btn-secondary">
+    ← Wróć do listy zleceń
+</a>
