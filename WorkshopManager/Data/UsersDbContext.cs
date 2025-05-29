@@ -12,5 +12,32 @@ namespace WorkshopManager.Data
         //public DbSet<ApplicationUser> Users { get; set; }
         //public DbSet<Client> Clients { get; set; }
         public DbSet<Vehicle> Vehicles { get; set; }
+        public DbSet<ServiceOrder> ServiceOrders { get; set; }
+        
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            base.OnModelCreating(builder);
+
+            // relacja ServiceOrder → Vehicle bez kaskady
+            builder.Entity<ServiceOrder>()
+                .HasOne(o => o.Vehicle)
+                .WithMany(v => v.ServiceOrders)     // jeśli masz kolekcję w Vehicle
+                .HasForeignKey(o => o.VehicleId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // relacja ServiceOrder → Mechanic (AspNetUsers) – tu można zostawić kaskadę
+            builder.Entity<ServiceOrder>()
+                .HasOne(o => o.Mechanic)
+                .WithMany()                         // bez kolekcji w ApplicationUser
+                .HasForeignKey(o => o.MechanicId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // domyślny status
+            builder.Entity<ServiceOrder>()
+                .Property(o => o.Status)
+                .HasDefaultValue("Nowe");
+        }
     }
+    
+    
 }

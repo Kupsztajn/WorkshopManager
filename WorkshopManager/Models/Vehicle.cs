@@ -18,4 +18,6 @@ public class Vehicle
     public ApplicationUser Client { get; set; }  // nawiązanie do klienta (jeśli klient to ApplicationUser)
     
     public string ImageUrl { get; set; }
+    
+    public ICollection<ServiceOrder> ServiceOrders { get; set; } = new List<ServiceOrder>();
 }
