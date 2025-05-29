@@ -24,6 +24,7 @@ public class ServiceOrderController :  Controller
         var order = await _context.ServiceOrders
             .Include(o => o.Vehicle)
             .Include(o => o.Mechanic)
+            .Include(o => o.ServiceTasks)
             .FirstOrDefaultAsync(o => o.Id == id);
 
         if (order == null) return NotFound();

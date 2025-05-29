@@ -14,6 +14,8 @@ namespace WorkshopManager.Data
         public DbSet<Vehicle> Vehicles { get; set; }
         public DbSet<ServiceOrder> ServiceOrders { get; set; }
         
+        public DbSet<ServiceTask> ServiceTasks { get; set; }
+        
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
@@ -36,6 +38,12 @@ namespace WorkshopManager.Data
             builder.Entity<ServiceOrder>()
                 .Property(o => o.Status)
                 .HasDefaultValue("Nowe");
+            
+            builder.Entity<ServiceTask>()
+                .HasOne(t => t.ServiceOrder)
+                .WithMany(o => o.ServiceTasks)
+                .HasForeignKey(t => t.ServiceOrderId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
     

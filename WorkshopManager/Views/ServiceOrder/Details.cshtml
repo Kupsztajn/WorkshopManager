@@ -53,3 +53,36 @@
         </a>
     }
 </p>
+
+<h3>Czynności serwisowe</h3>
+
+<p>
+    <a asp-controller="ServiceTask"
+       asp-action="Add"
+       asp-route-orderId="@Model.Id"
+       class="btn btn-sm btn-success mb-2">
+        Dodaj czynność
+    </a>
+</p>
+
+@if (Model.ServiceTasks.Any())
+{
+    <table class="table table-bordered">
+        <thead>
+        <tr><th>Opis</th><th>Koszt robocizny</th></tr>
+        </thead>
+        <tbody>
+        @foreach(var t in Model.ServiceTasks)
+        {
+            <tr>
+                <td>@t.Description</td>
+                <td>@t.LaborCost.ToString("F2")</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>Brak dodanych czynności.</p>
+}

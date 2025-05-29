@@ -22,4 +22,6 @@ public class ServiceOrder
     // przypisany mechanik (ApplicationUser.Id)
     public string MechanicId { get; set; }
     public ApplicationUser Mechanic { get; set; }
+    
+    public ICollection<ServiceTask> ServiceTasks { get; set; } = new List<ServiceTask>();
 }

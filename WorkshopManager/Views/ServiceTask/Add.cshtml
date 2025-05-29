@@ -1,0 +1,28 @@
+﻿@model WorkshopManager.Models.ViewModels.ServiceTaskCreateViewModel
+
+<h2>Dodaj czynność do zlecenia #@Model.ServiceOrderId</h2>
+
+<form asp-controller="ServiceTask" asp-action="Add" method="post">
+    <input type="hidden" asp-for="ServiceOrderId" />
+
+    <div class="mb-3">
+        <label asp-for="Description" class="form-label">Opis czynności</label>
+        <input asp-for="Description" class="form-control" />
+        <span asp-validation-for="Description" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="LaborCost" class="form-label">Koszt robocizny</label>
+        <input asp-for="LaborCost" type="number" step="0.01" class="form-control" />
+        <span asp-validation-for="LaborCost" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Dodaj</button>
+    <a asp-controller="ServiceOrder"
+       asp-action="Details"
+       asp-route-id="@Model.ServiceOrderId"
+       class="btn btn-secondary ms-2">← Anuluj</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
