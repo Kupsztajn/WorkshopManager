@@ -25,6 +25,10 @@ public class ServiceOrderController :  Controller
             .Include(o => o.Vehicle)
             .Include(o => o.Mechanic)
             .Include(o => o.ServiceTasks)
+            // a do każdej czynności dokładać jej UsedParts
+            .ThenInclude(st => st.UsedParts)
+            // i dalej: do każdego UsedPart dokładać encję Part (żeby poznać Name i UnitPrice)
+            .ThenInclude(up => up.Part)
             .FirstOrDefaultAsync(o => o.Id == id);
 
         if (order == null) return NotFound();

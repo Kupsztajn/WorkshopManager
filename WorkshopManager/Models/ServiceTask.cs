@@ -18,4 +18,7 @@ public class ServiceTask
         [Required]
         [Column(TypeName = "decimal(18,2)")]
         public decimal LaborCost { get; set; }
+        
+        // Dodaj nawigację do listy części
+        public ICollection<UsedPart> UsedParts { get; set; } = new List<UsedPart>();
 }

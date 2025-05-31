@@ -56,6 +56,91 @@
 
 <h3>Czynności serwisowe</h3>
 
+@foreach(var task in Model.ServiceTasks)
+{
+    <div class="card mb-3">
+        <div class="card-header">
+            <strong>Zadanie #@task.Id:</strong> @task.Description
+            (Koszt robocizny: @task.LaborCost.ToString("C"))
+            @if (isMechanic)
+            {
+                <a asp-controller="ServiceTaskPart"
+                   asp-action="Add"
+                   asp-route-serviceTaskId="@task.Id"
+                   class="btn btn-sm btn-success float-end">
+                    Dodaj część
+                </a>
+            }
+        </div>
+        <div class="card-body">
+            @if (task.UsedParts.Any())
+            {
+                <table class="table table-sm table-bordered">
+                    <thead>
+                    <tr>
+                        <th>Część</th>
+                        <th>Ilość</th>
+                        <th>Cena jedn. (PLN)</th>
+                        <th>Łączny koszt (PLN)</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @foreach(var up in task.UsedParts)
+                    {
+                        <tr>
+                            <td>@up.Part?.Name</td>
+                            <td>@up.Quantity</td>
+                            <td>@up.Part?.UnitPrice.ToString("F2")</td>
+                            <td>@up.TotalCost.ToString("F2")</td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <p>Brak użytych części.</p>
+            }
+        </div>
+    </div>
+}
+
+// **Sumowanie kosztów całego zlecenia**:
+<div class="alert alert-info">
+    @{
+        decimal laborSum = Model.ServiceTasks.Sum(t => t.LaborCost);
+        decimal partsSum = Model.ServiceTasks.Sum(t => t.UsedParts.Sum(up => up.TotalCost));
+        decimal totalOrderCost = laborSum + partsSum;
+    }
+    <p><strong>Suma robocizny:</strong> @laborSum.ToString("C")</p>
+    <p><strong>Suma części:</strong> @partsSum.ToString("C")</p>
+    <hr />
+    <p><strong>Całkowity koszt zlecenia:</strong> @totalOrderCost.ToString("C")</p>
+</div>
+
+<p>
+    @if (isMechanic)
+    {
+        <a asp-controller="Mechanik"
+           asp-action="MyOrders"
+           class="btn btn-secondary">
+            ← Wróć do moich zleceń
+        </a>
+    }
+    else
+    {
+        <a asp-controller="ServiceOrder"
+           asp-action="OrdersForVehicle"
+           asp-route-vehicleId="@Model.VehicleId"
+           class="btn btn-secondary">
+            ← Wróć do listy zleceń pojazdu
+        </a>
+    }
+</p>
+
+
+<!-- <h3>Czynności serwisowe</h3>
+
 <p>
     <a asp-controller="ServiceTask"
        asp-action="Add"
@@ -86,3 +171,4 @@ else
 {
     <p>Brak dodanych czynności.</p>
 }
+-->

@@ -1,0 +1,42 @@
+﻿@model WorkshopManager.Models.ViewModels.UsedPartCreateViewModel
+@using Microsoft.AspNetCore.Mvc.Rendering
+
+@{
+    ViewData["Title"] = "Dodaj część do czynności";
+    var taskDesc = ViewBag.TaskDescription as string;
+    var orderId = (int)ViewBag.OrderId;
+}
+
+<h2>Dodaj część do zadania</h2>
+
+<p><strong>Zadanie:</strong> @taskDesc</p>
+
+<form asp-controller="ServiceTaskPart"
+      asp-action="Add"
+      method="post">
+    <input type="hidden" asp-for="ServiceTaskId" />
+
+    <div class="mb-3">
+        <label asp-for="PartId" class="form-label">Wybierz część</label>
+        <select asp-for="PartId" class="form-select" asp-items="ViewBag.PartsList">
+            <option value="">-- wybierz część --</option>
+        </select>
+        <span asp-validation-for="PartId" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Quantity" class="form-label">Ilość (sztuk)</label>
+        <input asp-for="Quantity" type="number" class="form-control" />
+        <span asp-validation-for="Quantity" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Dodaj część</button>
+    <a asp-controller="ServiceOrder"
+       asp-action="Details"
+       asp-route-id="@orderId"
+       class="btn btn-secondary ms-2">← Anuluj</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

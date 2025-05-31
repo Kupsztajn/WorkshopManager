@@ -13,8 +13,9 @@ namespace WorkshopManager.Data
         //public DbSet<Client> Clients { get; set; }
         public DbSet<Vehicle> Vehicles { get; set; }
         public DbSet<ServiceOrder> ServiceOrders { get; set; }
-        
         public DbSet<ServiceTask> ServiceTasks { get; set; }
+        public DbSet<UsedPart> UsedParts { get; set; }
+        public DbSet<Part> Parts { get; set; }
         
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -44,6 +45,22 @@ namespace WorkshopManager.Data
                 .WithMany(o => o.ServiceTasks)
                 .HasForeignKey(t => t.ServiceOrderId)
                 .OnDelete(DeleteBehavior.Cascade);
+            
+            // Relacja 1:N ServiceTask → UsedPart
+            builder.Entity<UsedPart>()
+                .HasOne(up => up.ServiceTask)
+                .WithMany(st => st.UsedParts)           // ← dopisz w ServiceTask kolekcję UsedParts
+                .HasForeignKey(up => up.ServiceTaskId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Relacja 1:N Part → UsedPart (opcjonalnie, jeżeli potrzebujesz nawigacji w Part)
+            builder.Entity<UsedPart>()
+                .HasOne(up => up.Part)
+                .WithMany()                              // zakładamy, że nie masz kolekcji w Part
+                .HasForeignKey(up => up.PartId)
+                .OnDelete(DeleteBehavior.Restrict);
+            
+            
         }
     }
     
