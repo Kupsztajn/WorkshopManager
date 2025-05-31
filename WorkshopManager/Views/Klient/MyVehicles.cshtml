@@ -26,6 +26,12 @@
                 <a asp-controller="Vehicle" asp-action="Details" asp-route-id="@vehicle.Id" class="btn btn-sm btn-info">
                     Szczegóły
                 </a>
+                <a asp-controller="Klient"
+                   asp-action="OrdersForVehicle"
+                   asp-route-vehicleId="@vehicle.Id"
+                   class="btn btn-sm btn-primary">
+                    Zlecenia
+                </a>
             </td>
         </tr>
     }

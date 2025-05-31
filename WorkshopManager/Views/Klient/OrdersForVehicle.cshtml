@@ -1,0 +1,61 @@
+﻿@model IEnumerable<WorkshopManager.Models.ServiceOrder>
+
+@{
+    ViewData["Title"] = "Zlecenia dla pojazdu";
+    var vehicleName = (string)ViewBag.VehicleName;
+    var vehicleId = (int)ViewBag.VehicleId;
+}
+
+<h2>@ViewData["Title"]</h2>
+<p><strong>Pojazd:</strong> @vehicleName</p>
+
+@if (!Model.Any())
+{
+    <p>Brak zleceń dla tego pojazdu.</p>
+    <p>
+        <a asp-action="Vehicles" asp-controller="Klient" class="btn btn-secondary">
+            ← Wróć do listy pojazdów
+        </a>
+    </p>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>Numer zlecenia</th>
+            <th>Status</th>
+            <th>Mechanik</th>
+            <th>Data utworzenia</th>
+            <th>Ilość czynności</th>
+            <th></th> <!-- kolumna „Szczegóły” -->
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var o in Model)
+        {
+            <tr>
+                <td>@o.Id</td>
+                <td>@o.Status</td>
+                <td>@(o.Mechanic != null ? $"{o.Mechanic.Name} {o.Mechanic.Surname}" : "—")</td>
+                <td>@o.CreatedAt.ToLocalTime().ToString("g")</td>
+                <td>@o.ServiceTasks.Count()</td>
+                <td>
+                    <a asp-action="OrderDetails"
+                       asp-controller="Klient"
+                       asp-route-orderId="@o.Id"
+                       class="btn btn-sm btn-info">
+                        Szczegóły
+                    </a>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+
+    <p>
+        <a asp-action="Vehicles" asp-controller="Klient" class="btn btn-secondary">
+            ← Wróć do listy pojazdów
+        </a>
+    </p>
+}
