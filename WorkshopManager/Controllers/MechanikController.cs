@@ -29,8 +29,28 @@ public class MechanikController : Controller
             
         return View();
     }
+    public async Task<IActionResult> MyOrders(string mechanicId = null)
+    {
+        if (string.IsNullOrEmpty(mechanicId))
+        {
+            // Jeśli nie podano mechanicId, to spróbuj pobrać Id zalogowanego użytkownika (mechanika)
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+                return Challenge(); // nie zalogowany
+
+            mechanicId = user.Id;
+        }
+
+        var orders = await _context.ServiceOrders
+            .Where(o => o.MechanicId == mechanicId)
+            .Include(o => o.Vehicle)
+            .ToListAsync();
+
+        return View(orders);
+    }
     
     // GET: /Mechanik/MyOrders
+    /*
     public async Task<IActionResult> MyOrders()
     {
         var mech = await _userManager.GetUserAsync(User);
@@ -41,4 +61,6 @@ public class MechanikController : Controller
 
         return View(orders);
     }
+    */
+    
 }
