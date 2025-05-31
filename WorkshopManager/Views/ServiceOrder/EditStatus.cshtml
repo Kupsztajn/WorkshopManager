@@ -1,0 +1,37 @@
+﻿@model WorkshopManager.Models.ViewModels.ServiceOrderStatusEditViewModel
+
+@{
+    ViewData["Title"] = "Zmień status zlecenia";
+}
+
+<h2>@ViewData["Title"]<span class="text-muted"> (#@Model.OrderId)</span></h2>
+
+<div class="card mb-3">
+    <div class="card-body">
+        <form asp-action="EditStatus" method="post">
+            <input asp-for="OrderId" type="hidden" />
+
+            <div class="mb-3">
+                <label asp-for="CurrentStatus" class="form-label">Aktualny status:</label>
+                <!-- tylko do odczytu -->
+                <input asp-for="CurrentStatus" class="form-control" readonly />
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="NewStatus" class="form-label">Wybierz nowy status:</label>
+                <select asp-for="NewStatus" class="form-select"
+                        asp-items="new SelectList(Model.StatusesList.Select(s => s).ToList())">
+                    <option value="">-- wybierz status --</option>
+                </select>
+                <span asp-validation-for="NewStatus" class="text-danger"></span>
+            </div>
+
+            <button type="submit" class="btn btn-success">Zapisz zmianę</button>
+            <a asp-action="Details" asp-route-id="@Model.OrderId" class="btn btn-secondary ms-2">Anuluj</a>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

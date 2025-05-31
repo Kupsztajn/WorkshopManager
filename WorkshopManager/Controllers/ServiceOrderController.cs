@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -117,6 +118,100 @@ public class ServiceOrderController :  Controller
         return RedirectToAction("OrdersForVehicle", new { vehicleId = model.VehicleId });
     }
     
-    
+        // GET: /ServiceOrder/EditStatus/5
+    // Wyświetla formularz do zmiany statusu
+    [Authorize]  // najpierw weźmy auth, potem sprawdzimy w kodzie, czy ma prawo
+    [HttpGet]
+    public async Task<IActionResult> EditStatus(int id)
+    {
+        // 1) Pobierz zlecenie wraz z Mechanikiem (do weryfikacji uprawnień)
+        var order = await _context.ServiceOrders
+            .Include(o => o.Mechanic)
+            .Include(o => o.Vehicle)
+            .FirstOrDefaultAsync(o => o.Id == id);
 
+        if (order == null)
+            return NotFound();
+
+        // 2) Pobierz bieżącego usera
+        var user = await _userManager.GetUserAsync(User);
+        if (user == null)
+            return Challenge(); // nie jest zalogowany
+
+        // 3) Sprawdź uprawnienia: 
+        //    - jeśli nie jest w roli Admin i nie jest przypisanym mechanikiem, to forbidd
+        bool isAdmin = User.IsInRole("Admin");
+        bool isAssignedMechanic = (order.MechanicId == user.Id);
+
+        if (!isAdmin && !isAssignedMechanic)
+            return Forbid();
+
+        // 4) Przygotuj ViewModel
+        var vm = new ServiceOrderStatusEditViewModel
+        {
+            OrderId = order.Id,
+            CurrentStatus = order.Status,
+            // Dostępne statusy – zwykle pomijamy ten sam, co Current, ale można go zostawić
+            StatusesList = new List<string> { "Nowe", "W trakcie", "Zakończone", "Anulowane" }
+        };
+
+        return View(vm); // Views/ServiceOrder/EditStatus.cshtml
+    }
+
+    // POST: /ServiceOrder/EditStatus
+    [Authorize]
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> EditStatus(ServiceOrderStatusEditViewModel vm)
+    {
+        ModelState.Remove("StatusesList");
+        if (!ModelState.IsValid)
+        {
+            // W razie invalidu ponownie ustaw listę statusów i zwróć widok
+            vm.StatusesList = new List<string> { "Nowe", "W trakcie", "Zakończone", "Anulowane" };
+            return View(vm);
+        }
+
+        // 1) Pobierz zlecenie (razem z mechanic i vehicle)
+        var order = await _context.ServiceOrders
+            .Include(o => o.Mechanic)
+            .Include(o => o.Vehicle)
+            .FirstOrDefaultAsync(o => o.Id == vm.OrderId);
+
+        if (order == null)
+            return NotFound();
+
+        // 2) Weryfikacja uprawnień – jak wyżej w GET
+        var user = await _userManager.GetUserAsync(User);
+        if (user == null)
+            return Challenge();
+
+        bool isAdmin = User.IsInRole("Admin");
+        bool isAssignedMechanic = (order.MechanicId == user.Id);
+
+        if (!isAdmin && !isAssignedMechanic)
+            return Forbid();
+
+        // 3) Zmiana statusu
+        order.Status = vm.NewStatus;
+
+        // 4) Jeśli nowy status to "Zakończone", ustaw CompletedAt
+        if (vm.NewStatus == "Zakończone")
+        {
+            order.CompletedAt = DateTime.UtcNow;
+        }
+        else
+        {
+            // Jeśli ktoś zmienił status np. z "Zakończone" na inny, wyczyść completed date
+            order.CompletedAt = null;
+        }
+
+        // 5) Zapisz zmiany
+        _context.ServiceOrders.Update(order);
+        await _context.SaveChangesAsync();
+
+        // 6) Przekierowanie – jeżeli zmienił mechanik, możesz wysłać do własnych zleceń,
+        //    ale najczęściej wracamy do szczegółów zlecenia:
+        return RedirectToAction("Details", new { id = order.Id });
+    }
 }

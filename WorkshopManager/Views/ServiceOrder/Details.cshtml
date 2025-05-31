@@ -3,9 +3,21 @@
 @{
     ViewData["Title"] = "Szczegóły zlecenia";
     bool isMechanic = User.IsInRole("Mechanik");
+    bool isMechanicAssigned = User.IsInRole("Mechanik") && Model.MechanicId == User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+    bool isAdmin = User.IsInRole("Admin");
 }
 
 <h2>@ViewData["Title"] (#@Model.Id)</h2>
+
+<div class="mb-3">
+    <strong>Status:</strong> @Model.Status
+    @if (isMechanicAssigned || isAdmin)
+    {
+        <a asp-action="EditStatus" asp-route-id="@Model.Id" class="btn btn-sm btn-primary ms-2">
+            Zmień status
+        </a>
+    }
+</div>
 
 <div class="mb-3">
     <label class="form-label"><strong>Pojazd:</strong></label>

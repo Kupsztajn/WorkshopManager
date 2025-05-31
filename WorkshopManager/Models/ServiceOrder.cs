@@ -18,7 +18,9 @@ public class ServiceOrder
     public string Status { get; set; } = "Nowe";
 
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-
+    
+    public DateTime? CompletedAt { get; set; }
+    
     // przypisany mechanik (ApplicationUser.Id)
     public string MechanicId { get; set; }
     public ApplicationUser Mechanic { get; set; }

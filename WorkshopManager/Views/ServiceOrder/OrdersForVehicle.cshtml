@@ -15,7 +15,7 @@
 <table class="table">
     <thead>
     <tr>
-        <th>ID</th><th>Mechanik</th><th>Status</th><th>Opis</th><th>Data</th><th>Akcje</th>
+        <th>ID</th><th>Mechanik</th><th>Status</th><th>Opis</th><th>Data</th><th>Data zakoczenia</th><th>Akcje</th>
     </tr>
     </thead>
     <tbody>
@@ -27,6 +27,9 @@
             <td>@order.Status</td>
             <td>@order.Description</td>
             <td>@order.CreatedAt.ToLocalTime().ToString("g")</td>
+            <td>
+                @(order.CompletedAt.HasValue ? order.CompletedAt.Value.ToLocalTime().ToString("g") : "-")
+            </td>
             <td>
                 <a asp-action="Details"
                    asp-route-id="@order.Id"
