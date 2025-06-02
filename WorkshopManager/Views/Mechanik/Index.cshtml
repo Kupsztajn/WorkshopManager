@@ -1,14 +1,14 @@
-﻿@*
-  Views/Mechanik/Index.cshtml
-*@
-@{
+﻿@{
     ViewData["Title"] = "Panel Mechanika";
     var name = ViewBag.FirstName as string ?? "";
 }
-<h2>Panel Mechanika (@name)</h2>
 
-<p>
-    <a asp-action="MyOrders" class="btn btn-primary">
-        Zlecenia
-    </a>
-</p>
+<div class="container mt-5 text-center">
+    <h2 class="mb-4">Panel Mechanika <span class="text-primary">(@name)</span></h2>
+
+    <p>
+        <a asp-action="MyOrders" class="btn btn-lg btn-primary px-5">
+            Zlecenia
+        </a>
+    </p>
+</div>

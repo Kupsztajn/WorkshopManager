@@ -1,45 +1,67 @@
 ﻿@model List<WorkshopManager.Models.ViewModels.UserWithRolesViewModel>
 
-<table class="table">
-    <thead>
-    <tr>
-        <th>Email</th>
-        <th>Imię</th>
-        <th>Nazwisko</th>
-        <th>Role</th>
-        <th>Akcje</th>
-    </tr>
-    </thead>
-    <tbody>
-    @foreach (var user in Model)
+<div class="container mt-4">
+    <h2 class="mb-4">Lista użytkowników</h2>
+
+    @if (!Model.Any())
     {
-        <tr>
-            <td>@user.Email</td>
-            <td>@user.Name</td>
-            <td>@user.Surname</td>
-            <td>@string.Join(", ", user.Roles)</td>  <!-- Tutaj wyświetlamy role -->
-            <td>
-                <a asp-action="EditUserRoles" asp-route-userId="@user.Id" class="btn btn-sm btn-primary">Edytuj role</a>
-
-                @* tylko dla klientów *@
-                @if (user.Roles.Contains("Klient"))
-                {
-                    <a asp-action="ClientVehicles"
-                       asp-controller="Admin"
-                       asp-route-clientId="@user.Id"
-                       class="btn btn-sm btn-secondary ms-1">
-                        Pojazdy klienta
-                    </a>
-                }
-
-            @* Jeśli użytkownik jest mechanikiem, pokaż przycisk Zlecenia *@
-                @if(user.Roles.Contains("Mechanik"))
-                {
-                    <!-- Link do listy zleceń dla konkretnego mechanika (administrator) -->
-                    <a asp-controller="Mechanik" asp-action="MyOrders" asp-route-mechanicId="@user.Id" class="btn btn-sm btn-success ms-2">Zlecenia</a>
-                }
-            </td>
-        </tr>
+        <div class="alert alert-warning">Brak użytkowników do wyświetlenia.</div>
     }
-    </tbody>
-</table>
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-striped align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Email</th>
+                        <th>Imię</th>
+                        <th>Nazwisko</th>
+                        <th>Role</th>
+                        <th>Akcje</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var user in Model)
+                    {
+                        <tr>
+                            <td>@user.Email</td>
+                            <td>@user.Name</td>
+                            <td>@user.Surname</td>
+                            <td>
+                                @foreach(var role in user.Roles)
+                                {
+                                    <span class="badge bg-info text-dark me-1">@role</span>
+                                }
+                            </td>
+                            <td>
+                                <div class="d-flex flex-wrap gap-2">
+                                    <a asp-action="EditUserRoles" asp-route-userId="@user.Id" class="btn btn-sm btn-primary" title="Edytuj role">
+                                        <i class="bi bi-pencil-square me-1"></i> Edytuj role
+                                    </a>
+
+                                    @if (user.Roles.Contains("Klient"))
+                                    {
+                                        <a asp-action="ClientVehicles"
+                                           asp-controller="Admin"
+                                           asp-route-clientId="@user.Id"
+                                           class="btn btn-sm btn-secondary"
+                                           title="Pojazdy klienta">
+                                            <i class="bi bi-car-front-fill me-1"></i> Pojazdy klienta
+                                        </a>
+                                    }
+
+                                    @if (user.Roles.Contains("Mechanik"))
+                                    {
+                                        <a asp-controller="Mechanik" asp-action="MyOrders" asp-route-mechanicId="@user.Id" class="btn btn-sm btn-success" title="Zlecenia mechanika">
+                                            <i class="bi bi-list-check me-1"></i> Zlecenia
+                                        </a>
+                                    }
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

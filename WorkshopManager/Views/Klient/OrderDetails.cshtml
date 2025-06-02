@@ -2,94 +2,112 @@
 
 @{
     ViewData["Title"] = "Szczegóły zlecenia";
-    // klient nie ma przycisku „dodaj część” ani „dodaj czynność” – tylko odczyt
 }
 
-<h2>Szczegóły zlecenia #@Model.Id</h2>
-<hr />
+<div class="container mt-4">
+    <h2 class="mb-3">Szczegóły zlecenia #<span class="text-primary">@Model.Id</span></h2>
+    <hr />
 
-<div class="mb-3">
-    <strong>Pojazd:</strong>
-    @Model.Vehicle?.Brand @Model.Vehicle?.Model (VIN: @Model.Vehicle?.VIN)
-</div>
-<div class="mb-3">
-    <strong>Mechanik:</strong>
-    @(Model.Mechanic != null ? $"{Model.Mechanic.Name} {Model.Mechanic.Surname}" : "Brak przypisanego mechanika")
-</div>
-<div class="mb-3">
-    <strong>Status:</strong> @Model.Status
-</div>
-<div class="mb-3">
-    <strong>Opis problemu:</strong>
-    <p>@Model.Description</p>
-</div>
-<div class="mb-3">
-    <strong>Data utworzenia:</strong> @Model.CreatedAt.ToLocalTime().ToString("g")
-</div>
-
-<hr />
-<h3>Czynności serwisowe</h3>
-
-@foreach (var task in Model.ServiceTasks)
-{
-    <div class="card mb-3">
-        <div class="card-header">
-            <strong>Zadanie #@task.Id:</strong> 
-            @task.Description 
-            (Koszt robocizny: @task.LaborCost.ToString("C"))
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <strong>Pojazd:</strong>
+            <p class="mb-0">@Model.Vehicle?.Brand @Model.Vehicle?.Model</p>
+            <small class="text-muted">VIN: @Model.Vehicle?.VIN</small>
         </div>
-        <div class="card-body">
-            @if (task.UsedParts.Any())
-            {
-                <table class="table table-sm table-bordered">
-                    <thead>
-                        <tr>
-                            <th>Część</th>
-                            <th>Ilość</th>
-                            <th>Cena jedn. (PLN)</th>
-                            <th>Łączny koszt (PLN)</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    @foreach (var up in task.UsedParts)
-                    {
-                        <tr>
-                            <td>@up.Part?.Name</td>
-                            <td>@up.Quantity</td>
-                            <td>@up.Part?.UnitPrice.ToString("F2")</td>
-                            <td>@up.TotalCost.ToString("F2")</td>
-                        </tr>
-                    }
-                    </tbody>
-                </table>
-            }
-            else
-            {
-                <p>Brak użytych części dla tej czynności.</p>
-            }
+        <div class="col-md-6">
+            <strong>Mechanik:</strong>
+            <p class="mb-0">
+                @(Model.Mechanic != null 
+                    ? $"{Model.Mechanic.Name} {Model.Mechanic.Surname}" 
+                    : "<span class=\"text-muted fst-italic\">Brak przypisanego mechanika</span>")
+            </p>
         </div>
     </div>
-}
 
-<hr />
-@{
-    // Suma kosztów: robocizna + części
-    decimal laborSum = Model.ServiceTasks.Sum(t => t.LaborCost);
-    decimal partsSum = Model.ServiceTasks.Sum(t => t.UsedParts.Sum(up => up.TotalCost));
-    decimal totalOrderCost = laborSum + partsSum;
-}
-<div class="alert alert-info">
-    <p><strong>Suma robocizny:</strong> @laborSum.ToString("C")</p>
-    <p><strong>Suma części:</strong> @partsSum.ToString("C")</p>
+    <div class="mb-3">
+        <strong>Status:</strong> <span class="badge bg-info text-dark">@Model.Status</span>
+    </div>
+
+    <div class="mb-4">
+        <strong>Opis problemu:</strong>
+        <p class="border p-3 bg-light rounded">@Model.Description</p>
+    </div>
+
+    <div class="mb-4">
+        <strong>Data utworzenia:</strong> @Model.CreatedAt.ToLocalTime().ToString("g")
+    </div>
+
     <hr />
-    <p><strong>Całkowity koszt zlecenia:</strong> @totalOrderCost.ToString("C")</p>
-</div>
+    <h3 class="mb-3">Czynności serwisowe</h3>
 
-<p>
-    <a asp-controller="Klient" 
-       asp-action="OrdersForVehicle" 
-       asp-route-vehicleId="@ViewBag.VehicleId"
-       class="btn btn-secondary">
-       ← Wróć do listy zleceń pojazdu
-    </a>
-</p>
+    @if (!Model.ServiceTasks.Any())
+    {
+        <div class="alert alert-warning">
+            Brak wykonanych czynności serwisowych dla tego zlecenia.
+        </div>
+    }
+    else
+    {
+        @foreach (var task in Model.ServiceTasks)
+        {
+            <div class="card mb-4 shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <strong>Zadanie #@task.Id:</strong> @task.Description
+                    <span class="badge bg-light text-primary float-end">Koszt robocizny: @task.LaborCost.ToString("C")</span>
+                </div>
+                <div class="card-body">
+                    @if (task.UsedParts.Any())
+                    {
+                        <table class="table table-sm table-bordered table-hover align-middle mb-0">
+                            <thead class="table-secondary">
+                                <tr>
+                                    <th>Część</th>
+                                    <th>Ilość</th>
+                                    <th>Cena jedn. (PLN)</th>
+                                    <th>Łączny koszt (PLN)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var up in task.UsedParts)
+                                {
+                                    <tr>
+                                        <td>@up.Part?.Name</td>
+                                        <td>@up.Quantity</td>
+                                        <td>@up.Part?.UnitPrice.ToString("F2")</td>
+                                        <td>@up.TotalCost.ToString("F2")</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    }
+                    else
+                    {
+                        <p class="fst-italic text-muted mb-0">Brak użytych części dla tej czynności.</p>
+                    }
+                </div>
+            </div>
+        }
+    }
+
+    <hr />
+    @{
+        decimal laborSum = Model.ServiceTasks.Sum(t => t.LaborCost);
+        decimal partsSum = Model.ServiceTasks.Sum(t => t.UsedParts.Sum(up => up.TotalCost));
+        decimal totalOrderCost = laborSum + partsSum;
+    }
+    <div class="alert alert-info fs-5">
+        <p><strong>Suma robocizny:</strong> @laborSum.ToString("C")</p>
+        <p><strong>Suma części:</strong> @partsSum.ToString("C")</p>
+        <hr />
+        <p class="fw-bold fs-4">Całkowity koszt zlecenia: @totalOrderCost.ToString("C")</p>
+    </div>
+
+    <p>
+        <a asp-controller="Klient" 
+           asp-action="OrdersForVehicle" 
+           asp-route-vehicleId="@ViewBag.VehicleId"
+           class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left me-2"></i> Wróć do listy zleceń pojazdu
+        </a>
+    </p>
+</div>

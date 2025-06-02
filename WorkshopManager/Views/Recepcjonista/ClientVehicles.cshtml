@@ -2,51 +2,64 @@
 @{
     ViewData["Title"] = "Pojazdy klienta";
 }
-<h2>Pojazdy klienta: @ViewBag.ClientName</h2>
 
-<table class="table">
-    <thead>
-    <tr>
-        <th>Marka</th>
-        <th>Model</th>
-        <th>VIN</th>
-        <th>Rejestracja</th>
-        <th>Rok</th>
-        <th>Zdjęcie</th>
-    </tr>
-    </thead>
-    <tbody>
-    @foreach(var v in Model) {
-        <tr>
-            <td>@v.Brand</td>
-            <td>@v.Model</td>
-            <td>@v.VIN</td>
-            <td>@v.Registration</td>
-            <td>@v.Year</td>
-            <td>
-                @if(!string.IsNullOrEmpty(v.ImageUrl)) {
-                    <img src="~@v.ImageUrl" alt="zdjęcie" style="max-height:75px" />
-                }
-            </td>
+<div class="container mt-4">
+    <h2 class="mb-4">Pojazdy klienta: <span class="text-primary">@ViewBag.ClientName</span></h2>
 
-            <td>                    <!-- przycisk Szczegóły -->
-                <a asp-controller="Vehicle"
-                   asp-action="Details"
-                   asp-route-id="@v.Id"
-                   class="btn btn-sm btn-primary">
-                    Szczegóły
-                </a>
-            </td>
-            
-            <td>
-                <a asp-controller="ServiceOrder" asp-action="OrdersForVehicle" asp-route-vehicleId="@v.Id" class="btn btn-sm btn-info ms-1">
-                    Zlecenia
-                </a>
-            </td>
-            
-            
-        </tr>
+    @if (!Model.Any())
+    {
+        <div class="alert alert-warning" role="alert">
+            Brak pojazdów dla tego klienta.
+        </div>
     }
-    
-    </tbody>
-</table>
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-striped align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Marka</th>
+                        <th>Model</th>
+                        <th>VIN</th>
+                        <th>Rejestracja</th>
+                        <th>Rok</th>
+                        <th>Zdjęcie</th>
+                        <th colspan="2" class="text-center">Akcje</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var v in Model)
+                    {
+                        <tr>
+                            <td>@v.Brand</td>
+                            <td>@v.Model</td>
+                            <td><code>@v.VIN</code></td>
+                            <td>@v.Registration</td>
+                            <td>@v.Year</td>
+                            <td>
+                                @if (!string.IsNullOrEmpty(v.ImageUrl))
+                                {
+                                    <img src="~@v.ImageUrl" alt="Zdjęcie pojazdu" class="img-thumbnail" style="max-height:75px; max-width:120px;" />
+                                }
+                                else
+                                {
+                                    <span class="text-muted fst-italic">Brak zdjęcia</span>
+                                }
+                            </td>
+                            <td class="text-center">
+                                <a asp-controller="Vehicle" asp-action="Details" asp-route-id="@v.Id" class="btn btn-sm btn-primary">
+                                    <i class="bi bi-info-circle me-1"></i> Szczegóły
+                                </a>
+                            </td>
+                            <td class="text-center">
+                                <a asp-controller="ServiceOrder" asp-action="OrdersForVehicle" asp-route-vehicleId="@v.Id" class="btn btn-sm btn-info">
+                                    <i class="bi bi-list-check me-1"></i> Zlecenia
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

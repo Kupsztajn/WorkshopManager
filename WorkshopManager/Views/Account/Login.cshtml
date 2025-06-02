@@ -1,21 +1,46 @@
 ﻿@model WorkshopManager.Models.ViewModels.LoginViewModel
 
-<form asp-action="Login" method="post">
-    <div asp-validation-summary="All" class="text-danger"></div>
-    <a asp-controller="Account" asp-action="Register">Zarejestruj się</a>
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-5 col-lg-4">
+            <div class="card mt-5 shadow-sm">
+                <div class="card-body">
+                    <h3 class="card-title text-center mb-4">Logowanie</h3>
 
-    <div>
-        <label asp-for="Username"></label>
-        <input asp-for="Username" />
-        <span asp-validation-for="Username" class="text-danger"></span>
+                    <form asp-action="Login" method="post">
+                        <div asp-validation-summary="All" class="alert alert-danger"></div>
+
+                        <div class="mb-3 text-center">
+                            <a asp-controller="Account" asp-action="Register" class="btn btn-outline-secondary btn-sm">
+                                Nie masz konta? Zarejestruj się
+                            </a>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Username" class="form-label"></label>
+                            <input asp-for="Username" class="form-control" placeholder="Wpisz nazwę użytkownika" />
+                            <span asp-validation-for="Username" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="Password" class="form-label"></label>
+                            <input asp-for="Password" type="password" class="form-control" placeholder="Podaj hasło" />
+                            <span asp-validation-for="Password" class="text-danger small"></span>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100">
+                            Zaloguj się
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="text-center mt-3">
+                <small class="text-muted">© Szarlotka – Wszystkie prawa zastrzeżone</small>
+            </div>
+        </div>
     </div>
-    <div>
-        <label asp-for="Password"></label>
-        <input asp-for="Password" type="password" />
-        <span asp-validation-for="Password" class="text-danger"></span>
-    </div>
-    <button type="submit">Zaloguj</button>
-</form>
+</div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />

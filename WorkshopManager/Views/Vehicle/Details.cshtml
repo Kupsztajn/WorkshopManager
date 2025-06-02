@@ -1,14 +1,24 @@
 ﻿@model WorkshopManager.Models.Vehicle
 
-<h2>Szczegóły pojazdu</h2>
+<div class="container mt-4">
+    <h2 class="mb-4">Szczegóły pojazdu</h2>
 
-<p><strong>Marka:</strong> @Model.Brand</p>
-<p><strong>Model:</strong> @Model.Model</p>
-<p><strong>VIN:</strong> @Model.VIN</p>
-<p><strong>Rejestracja:</strong> @Model.Registration</p>
-<p><strong>Rok:</strong> @Model.Year</p>
+    <div class="row">
+        <div class="col-md-6">
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item"><strong>Marka:</strong> @Model.Brand</li>
+                <li class="list-group-item"><strong>Model:</strong> @Model.Model</li>
+                <li class="list-group-item"><strong>VIN:</strong> <code>@Model.VIN</code></li>
+                <li class="list-group-item"><strong>Rejestracja:</strong> @Model.Registration</li>
+                <li class="list-group-item"><strong>Rok:</strong> @Model.Year</li>
+            </ul>
+        </div>
 
-@if (!string.IsNullOrEmpty(@Model.ImageUrl))
-{
-    <img src="@Model.ImageUrl" alt="Zdjęcie pojazdu" class="img-thumbnail" style="max-width:400px;" />
-}
+        @if (!string.IsNullOrEmpty(Model.ImageUrl))
+        {
+            <div class="col-md-6 d-flex justify-content-center align-items-center mt-4 mt-md-0">
+                <img src="@Model.ImageUrl" alt="Zdjęcie pojazdu" class="img-fluid img-thumbnail shadow-sm" style="max-height:400px;" />
+            </div>
+        }
+    </div>
+</div>

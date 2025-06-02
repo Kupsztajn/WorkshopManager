@@ -5,39 +5,54 @@
     ViewData["Title"] = "Moje zlecenia";
 }
 
-<h2>Moje zlecenia</h2>
+<div class="container mt-4">
+    <h2 class="mb-4">Moje zlecenia</h2>
 
-<table class="table table-striped">
-    <thead>
-    <tr>
-        <th>ID</th>
-        <th>Pojazd</th>
-        <th>Status</th>
-        <th>Opis</th>
-        <th>Data utworzenia</th>
-        <th>Data zakończenia</th>
-        <th>Akcje</th>
-    </tr>
-    </thead>
-    <tbody>
-    @foreach(var o in Model)
+    @if (!Model.Any())
     {
-        <tr>
-            <td>@o.Id</td>
-            <td>@o.Vehicle?.Brand @o.Vehicle?.Model</td>
-            <td>@o.Status</td>
-            <td>@o.Description</td>
-            <td>@o.CreatedAt.ToLocalTime().ToString("g")</td>
-            <td>@(o.CompletedAt.HasValue ? o.CompletedAt.Value.ToLocalTime().ToString("g") : "-")</td>
-            <td>
-                <a asp-controller="ServiceOrder"
-                   asp-action="Details"
-                   asp-route-id="@o.Id"
-                   class="btn btn-sm btn-primary">
-                    Szczegóły
-                </a>
-            </td>
-        </tr>
+        <div class="alert alert-warning" role="alert">
+            Nie masz jeszcze żadnych zleceń.
+        </div>
     }
-    </tbody>
-</table>
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-striped align-middle">
+                <thead class="table-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Pojazd</th>
+                    <th>Status</th>
+                    <th>Opis</th>
+                    <th>Data utworzenia</th>
+                    <th>Data zakończenia</th>
+                    <th>Akcje</th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach(var o in Model)
+                {
+                    <tr>
+                        <td>@o.Id</td>
+                        <td>@o.Vehicle?.Brand @o.Vehicle?.Model</td>
+                        <td>
+                            <span class="badge bg-info text-dark">@o.Status</span>
+                        </td>
+                        <td>@o.Description</td>
+                        <td>@o.CreatedAt.ToLocalTime().ToString("g")</td>
+                        <td>@(o.CompletedAt.HasValue ? o.CompletedAt.Value.ToLocalTime().ToString("g") : "-")</td>
+                        <td>
+                            <a asp-controller="ServiceOrder"
+                               asp-action="Details"
+                               asp-route-id="@o.Id"
+                               class="btn btn-sm btn-primary">
+                                <i class="bi bi-info-circle me-1"></i> Szczegóły
+                            </a>
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

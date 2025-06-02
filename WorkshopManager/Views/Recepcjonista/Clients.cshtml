@@ -1,36 +1,47 @@
 ﻿@model List<WorkshopManager.Models.ApplicationUser>
 
-<h2>Lista klientów</h2>
+<div class="container mt-4">
+    <h2 class="mb-4">Lista klientów</h2>
 
-<table class="table">
-    <thead>
-    <tr>
-        <th>Imię</th>
-        <th>Nazwisko</th>
-        <th>Email</th>
-    </tr>
-    </thead>
-    <tbody>
-    @foreach (var client in Model)
+    @if (!Model.Any())
     {
-        <tr>
-            <td>@client.Name</td>
-            <td>@client.Surname</td>
-            <td>@client.Email</td>
-            <td>
-                <a asp-controller="Vehicle" asp-action="Add" asp-route-clientId="@client.Id" class="btn btn-sm btn-success">
-                    Dodaj pojazd
-                </a>
-            </td>
-
-            <td>
-                <a asp-action="ClientVehicles"
-                   asp-route-clientId="@client.Id"
-                   class="btn btn-sm btn-secondary">
-                    Pojazdy klienta
-                </a>
-            </td>
-        </tr>
+        <div class="alert alert-warning" role="alert">
+            Brak klientów do wyświetlenia.
+        </div>
     }
-    </tbody>
-</table>
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-striped align-middle">
+                <thead class="table-dark">
+                <tr>
+                    <th>Imię</th>
+                    <th>Nazwisko</th>
+                    <th>Email</th>
+                    <th colspan="2" class="text-center">Akcje</th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach (var client in Model)
+                {
+                    <tr>
+                        <td>@client.Name</td>
+                        <td>@client.Surname</td>
+                        <td>@client.Email</td>
+                        <td class="text-center">
+                            <a asp-controller="Vehicle" asp-action="Add" asp-route-clientId="@client.Id" class="btn btn-sm btn-success">
+                                <i class="bi bi-plus-circle me-1"></i> Dodaj pojazd
+                            </a>
+                        </td>
+                        <td class="text-center">
+                            <a asp-action="ClientVehicles" asp-route-clientId="@client.Id" class="btn btn-sm btn-secondary">
+                                <i class="bi bi-car-front-fill me-1"></i> Pojazdy klienta
+                            </a>
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

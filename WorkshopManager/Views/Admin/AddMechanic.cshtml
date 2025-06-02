@@ -1,52 +1,61 @@
 ﻿@model WorkshopManager.Models.ViewModels.CreateUserViewModel
-@if (TempData["SuccessMessage"] != null)
-{
-    <div class="alert alert-success">
-        @TempData["SuccessMessage"]
-    </div>
-    <script>
-        setTimeout(function() {
-        window.location.href = '@Url.Action("Index", "Admin")';
-    }, 3000);
-    </script>
-}
 
-@if (TempData["ErrorMessage"] != null)
-{
-    <div class="alert alert-danger">
-        @TempData["ErrorMessage"]
-    </div>
-}
+<div class="container mt-4">
+    <h2 class="mb-4">Dodaj Mechanika</h2>
 
-<h2>Dodaj Mechanika</h2>
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        <script>
+            setTimeout(function () {
+                window.location.href = '@Url.Action("Index", "Admin")';
+            }, 3000);
+        </script>
+    }
 
-<form asp-action="AddMechanic" method="post">
-    
-    <div>
-        <label asp-for="Name"></label>
-        <input asp-for="Name" />
-        <span asp-validation-for="Name"></span>
-    </div>
-    <div>
-        <label asp-for="Surname"></label>
-        <input asp-for="Surname" />
-        <span asp-validation-for="Surname"></span>
-    </div>
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
 
-    <div>
-        <label asp-for="Email"></label>
-        <input asp-for="Email"/>
-        <span asp-validation-for="Email" class="text-danger"></span>
-    </div>
-    <div>
-        <label asp-for="Password"></label>
-        <input asp-for="Password" type="password"/>
-        <span asp-validation-for="Password" class="text-danger"></span>
-    </div>
-    <button type="submit">Dodaj</button>
-</form>
+    <form asp-action="AddMechanic" method="post" novalidate>
+        <div asp-validation-summary="All" class="alert alert-danger d-none"></div>
 
+        <div class="mb-3">
+            <label asp-for="Name" class="form-label"></label>
+            <input asp-for="Name" class="form-control" placeholder="Wpisz imię" />
+            <span asp-validation-for="Name" class="text-danger small"></span>
+        </div>
 
+        <div class="mb-3">
+            <label asp-for="Surname" class="form-label"></label>
+            <input asp-for="Surname" class="form-control" placeholder="Wpisz nazwisko" />
+            <span asp-validation-for="Surname" class="text-danger small"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Email" class="form-label"></label>
+            <input asp-for="Email" class="form-control" placeholder="Wpisz adres e-mail" />
+            <span asp-validation-for="Email" class="text-danger small"></span>
+        </div>
+
+        <div class="mb-4">
+            <label asp-for="Password" class="form-label"></label>
+            <input asp-for="Password" type="password" class="form-control" placeholder="Wpisz hasło" />
+            <span asp-validation-for="Password" class="text-danger small"></span>
+        </div>
+
+        <button type="submit" class="btn btn-success w-100">
+            Dodaj
+        </button>
+    </form>
+</div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />

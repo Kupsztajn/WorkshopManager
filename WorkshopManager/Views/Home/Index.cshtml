@@ -5,13 +5,19 @@
     ViewData["Title"] = "Home";
 }
 
-<h1>Witamy w Workshop Manager!</h1>
-<p>Tu możesz zarządzać swoim warsztatem samochodowym.</p>
+<div class="container mt-5 text-center">
+    <h1 class="display-4 mb-3">Witamy w Workshop Manager!</h1>
+    <p class="lead mb-4">Tu możesz zarządzać swoim warsztatem samochodowym.</p>
 
-@if (!SignInManager.IsSignedIn(User))
-{
-    <div class="mb-4 text-center">
-        <a class="btn btn-primary me-2" asp-controller="Account" asp-action="Login">Zaloguj się</a>
-        <a class="btn btn-outline-primary" asp-controller="Account" asp-action="Register">Zarejestruj się</a>
-    </div>
-}
+    @if (!SignInManager.IsSignedIn(User))
+    {
+        <div>
+            <a class="btn btn-lg btn-primary me-3 px-4" asp-controller="Account" asp-action="Login">
+                Zaloguj się
+            </a>
+            <a class="btn btn-lg btn-outline-primary px-4" asp-controller="Account" asp-action="Register">
+                Zarejestruj się
+            </a>
+        </div>
+    }
+</div>

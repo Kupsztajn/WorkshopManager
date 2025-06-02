@@ -3,11 +3,21 @@
     var firstName = ViewBag.FirstName as string;
 }
 
-<h2>Panel Recepcjonisty @firstName</h2>
+<div class="container mt-5">
+    <h2 class="mb-4">Panel Recepcjonisty <span class="text-primary">@firstName</span></h2>
 
-<p>Witaj, @firstName! Tutaj możesz zarządzać swoimi zadaniami.</p>
-<a asp-controller="Recepcjonista" asp-action="AddClient" class="btn btn-primary mb-3">Dodaj klienta</a>
-<a asp-controller="Recepcjonista" asp-action="Clients" class="btn btn-primary mb-3">Lista klientów</a>
-<!-- <a asp-controller="Vehicle" asp-action="Add" asp-route-clientId="tutaj_id_klienta" class="btn btn-primary mb-3">
-    Dodaj pojazd
-</a> -->
+    <p class="lead">Witaj, <strong>@firstName</strong>! Tutaj możesz zarządzać swoimi zadaniami.</p>
+
+    <div class="d-flex flex-wrap gap-3">
+        <a asp-controller="Recepcjonista" asp-action="AddClient" class="btn btn-primary btn-lg px-4">
+            Dodaj klienta
+        </a>
+        <a asp-controller="Recepcjonista" asp-action="Clients" class="btn btn-primary btn-lg px-4">
+            Lista klientów
+        </a>
+        @* Przykładowy przycisk na przyszłość (odkomentuj i uzupełnij klientId gdy potrzeba) *@
+        @* <a asp-controller="Vehicle" asp-action="Add" asp-route-clientId="tutaj_id_klienta" class="btn btn-primary btn-lg px-4">
+            Dodaj pojazd
+           </a> *@
+    </div>
+</div>

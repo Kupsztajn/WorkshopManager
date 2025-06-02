@@ -1,43 +1,68 @@
 ﻿@model List<WorkshopManager.Models.ServiceOrder>
 @{
     ViewData["Title"] = "Zlecenia dla pojazdu";
-    var vid = (int)ViewBag.VehicleId;;
+    var vid = (int)ViewBag.VehicleId;
 }
-<a asp-controller="ServiceOrder"
-   asp-action="Create"
-   asp-route-id="@vid"
-   class="btn btn-success mb-3">
-    Dodaj zlecenie
-</a>
 
-<h2>Zlecenia dla pojazdu #@vid</h2>
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>Zlecenia dla pojazdu <span class="text-primary">#@vid</span></h2>
+        <a asp-controller="ServiceOrder"
+           asp-action="Create"
+           asp-route-id="@vid"
+           class="btn btn-success">
+            <i class="bi bi-plus-lg me-1"></i> Dodaj zlecenie
+        </a>
+    </div>
 
-<table class="table">
-    <thead>
-    <tr>
-        <th>ID</th><th>Mechanik</th><th>Status</th><th>Opis</th><th>Data</th><th>Data zakoczenia</th><th>Akcje</th>
-    </tr>
-    </thead>
-    <tbody>
-    @foreach(var order in Model)
+    @if (!Model.Any())
     {
-        <tr>
-            <td>@order.Id</td>
-            <td>@order.Mechanic?.Name ?? "–"</td>
-            <td>@order.Status</td>
-            <td>@order.Description</td>
-            <td>@order.CreatedAt.ToLocalTime().ToString("g")</td>
-            <td>
-                @(order.CompletedAt.HasValue ? order.CompletedAt.Value.ToLocalTime().ToString("g") : "-")
-            </td>
-            <td>
-                <a asp-action="Details"
-                   asp-route-id="@order.Id"
-                   class="btn btn-sm btn-primary">
-                    Szczegóły
-                </a>
-            </td>
-        </tr>
+        <div class="alert alert-warning" role="alert">
+            Brak zleceń dla tego pojazdu.
+        </div>
     }
-    </tbody>
-</table>
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-striped align-middle">
+                <thead class="table-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Mechanik</th>
+                    <th>Status</th>
+                    <th>Opis</th>
+                    <th>Data utworzenia</th>
+                    <th>Data zakończenia</th>
+                    <th>Akcje</th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach(var order in Model)
+                {
+                    <tr>
+                        <td>@order.Id</td>
+                        <td>@(order.Mechanic?.Name ?? "–")</td>
+                        <td>
+                            <span class="badge bg-info text-dark">@order.Status</span>
+                        </td>
+                        <td>@order.Description</td>
+                        <td>@order.CreatedAt.ToLocalTime().ToString("g")</td>
+                        <td>
+                            @(order.CompletedAt.HasValue
+                                ? order.CompletedAt.Value.ToLocalTime().ToString("g")
+                                : "-")
+                        </td>
+                        <td>
+                            <a asp-action="Details"
+                               asp-route-id="@order.Id"
+                               class="btn btn-sm btn-primary">
+                                <i class="bi bi-info-circle me-1"></i> Szczegóły
+                            </a>
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

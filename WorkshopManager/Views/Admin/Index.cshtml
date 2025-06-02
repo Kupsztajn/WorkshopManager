@@ -3,11 +3,27 @@
 @inject SignInManager<ApplicationUser> SignInManager
 @inject UserManager<ApplicationUser> UserManager
 
-<h2>Panel Administratora</h2>
+<div class="container mt-4">
+    <h2 class="mb-4">Panel Administratora</h2>
 
-@if (User.IsInRole("Admin"))
-{
-    <a class="btn btn-primary" asp-controller="Admin" asp-action="AddReceptionist">Dodaj Recepcjonistę</a>
-    <a class="btn btn-primary" asp-controller="Admin" asp-action="AddMechanic">Dodaj Mechanika</a>
-    <a asp-controller="Admin" asp-action="Users">Lista użytkowników</a>
-}
+    @if (User.IsInRole("Admin"))
+    {
+        <div class="d-flex flex-wrap gap-3 mb-3">
+            <a class="btn btn-primary" asp-controller="Admin" asp-action="AddReceptionist">
+                <i class="bi bi-person-plus-fill me-2"></i>Dodaj Recepcjonistę
+            </a>
+            <a class="btn btn-primary" asp-controller="Admin" asp-action="AddMechanic">
+                <i class="bi bi-person-plus-fill me-2"></i>Dodaj Mechanika
+            </a>
+            <a class="btn btn-outline-secondary" asp-controller="Admin" asp-action="Users">
+                <i class="bi bi-people-fill me-2"></i>Lista użytkowników
+            </a>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-warning" role="alert">
+            Nie masz uprawnień do dostępu do tego panelu.
+        </div>
+    }
+</div>

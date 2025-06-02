@@ -3,7 +3,14 @@
     var firstName = ViewBag.FirstName as string;
 }
 
-<h2>Panel Klienta @firstName</h2>
+<div class="container mt-5">
+    <h2 class="mb-3">Panel Klienta <span class="text-primary">@firstName</span></h2>
 
-<p>Witaj, @firstName! Tutaj możesz zarządzać swoimi zamówieniami.</p>
-<a asp-controller="Klient" asp-action="MyVehicles" class="btn btn-primary mb-3">Moje pojazdy</a>
+    <p class="lead">
+        Witaj, <strong>@firstName</strong>! Tutaj możesz zarządzać swoimi zamówieniami.
+    </p>
+
+    <a asp-controller="Klient" asp-action="MyVehicles" class="btn btn-lg btn-primary">
+        Moje pojazdy
+    </a>
+</div>

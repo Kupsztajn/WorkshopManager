@@ -3,184 +3,135 @@
 @{
     ViewData["Title"] = "Szczegóły zlecenia";
     bool isMechanic = User.IsInRole("Mechanik");
-    bool isMechanicAssigned = User.IsInRole("Mechanik") && Model.MechanicId == User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+    bool isMechanicAssigned = isMechanic && Model.MechanicId == User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
     bool isAdmin = User.IsInRole("Admin");
 }
 
-<h2>@ViewData["Title"] (#@Model.Id)</h2>
+<div class="container mt-4">
+    <h2 class="mb-3">@ViewData["Title"] <span class="text-primary">#@Model.Id</span></h2>
 
-<div class="mb-3">
-    <strong>Status:</strong> @Model.Status
-    @if (isMechanicAssigned || isAdmin)
+    <div class="mb-3 d-flex align-items-center">
+        <strong>Status:</strong>
+        <span class="badge bg-info text-dark ms-2">@Model.Status</span>
+        @if (isMechanicAssigned || isAdmin)
+        {
+            <a asp-action="EditStatus" asp-route-id="@Model.Id" class="btn btn-sm btn-primary ms-auto">
+                Zmień status
+            </a>
+        }
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-6 mb-3">
+            <label class="form-label"><strong>Pojazd:</strong></label>
+            <div>@Model.Vehicle?.Brand @Model.Vehicle?.Model</div>
+        </div>
+        <div class="col-md-6 mb-3">
+            <label class="form-label"><strong>VIN:</strong></label>
+            <div><code>@Model.Vehicle?.VIN</code></div>
+        </div>
+        <div class="col-md-6 mb-3">
+            <label class="form-label"><strong>Mechanik:</strong></label>
+            <div>
+                @(Model.Mechanic != null
+                    ? $"{Model.Mechanic.Name} {Model.Mechanic.Surname}"
+                    : "<span class=\"text-muted fst-italic\">Brak przypisanego mechanika</span>")
+            </div>
+        </div>
+        <div class="col-md-6 mb-3">
+            <label class="form-label"><strong>Data utworzenia:</strong></label>
+            <div>@Model.CreatedAt.ToLocalTime().ToString("g")</div>
+        </div>
+    </div>
+
+    <div class="mb-4">
+        <label class="form-label"><strong>Opis:</strong></label>
+        <p class="border rounded p-3 bg-light">@Model.Description</p>
+    </div>
+
+    <h3 class="mb-3">Czynności serwisowe</h3>
+
+    @if (!Model.ServiceTasks.Any())
     {
-        <a asp-action="EditStatus" asp-route-id="@Model.Id" class="btn btn-sm btn-primary ms-2">
-            Zmień status
-        </a>
-    }
-</div>
-
-<div class="mb-3">
-    <label class="form-label"><strong>Pojazd:</strong></label>
-    <span>@Model.Vehicle?.Brand @Model.Vehicle?.Model</span>
-</div>
-<div class="mb-3">
-    <label class="form-label"><strong>VIN:</strong></label>
-    <span>@Model.Vehicle?.VIN</span>
-</div>
-<div class="mb-3">
-    <label class="form-label"><strong>Mechanik:</strong></label>
-    <span>@Model.Mechanic?.Name @Model.Mechanic?.Surname</span>
-</div>
-<div class="mb-3">
-    <label class="form-label"><strong>Status:</strong></label>
-    <span>@Model.Status</span>
-</div>
-<div class="mb-3">
-    <label class="form-label"><strong>Opis:</strong></label>
-    <p>@Model.Description</p>
-</div>
-<div class="mb-3">
-    <label class="form-label"><strong>Data utworzenia:</strong></label>
-    <span>@Model.CreatedAt.ToLocalTime().ToString("g")</span>
-</div>
-
-<p>
-    @if (isMechanic)
-    {
-        <!-- dla mechanika idź do jego listy zleceń -->
-        <a asp-controller="Mechanik"
-           asp-action="MyOrders"
-           class="btn btn-secondary">
-            ← Wróć do moich zleceń
-        </a>
+        <div class="alert alert-warning">Brak wykonanych czynności serwisowych dla tego zlecenia.</div>
     }
     else
     {
-        <!-- dla wszystkich innych (recepcjonista, admin) idź do zleceń pojazdu -->
-        <a asp-controller="ServiceOrder"
-           asp-action="OrdersForVehicle"
-           asp-route-vehicleId="@Model.VehicleId"
-           class="btn btn-secondary">
-            ← Wróć do listy zleceń
-        </a>
-    }
-</p>
-
-<h3>Czynności serwisowe</h3>
-
-@foreach(var task in Model.ServiceTasks)
-{
-    <div class="card mb-3">
-        <div class="card-header">
-            <strong>Zadanie #@task.Id:</strong> @task.Description
-            (Koszt robocizny: @task.LaborCost.ToString("C"))
-            @if (isMechanic)
-            {
-                <a asp-controller="ServiceTaskPart"
-                   asp-action="Add"
-                   asp-route-serviceTaskId="@task.Id"
-                   class="btn btn-sm btn-success float-end">
-                    Dodaj część
-                </a>
-            }
-        </div>
-        <div class="card-body">
-            @if (task.UsedParts.Any())
-            {
-                <table class="table table-sm table-bordered">
-                    <thead>
-                    <tr>
-                        <th>Część</th>
-                        <th>Ilość</th>
-                        <th>Cena jedn. (PLN)</th>
-                        <th>Łączny koszt (PLN)</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    @foreach(var up in task.UsedParts)
+        @foreach (var task in Model.ServiceTasks)
+        {
+            <div class="card mb-4 shadow-sm">
+                <div class="card-header bg-primary text-white d-flex align-items-center">
+                    <strong>Zadanie #@task.Id:</strong>
+                    <span class="ms-3 flex-grow-1">@task.Description</span>
+                    <span class="badge bg-light text-primary me-3">Koszt robocizny: @task.LaborCost.ToString("C")</span>
+                    @if (isMechanic)
                     {
-                        <tr>
-                            <td>@up.Part?.Name</td>
-                            <td>@up.Quantity</td>
-                            <td>@up.Part?.UnitPrice.ToString("F2")</td>
-                            <td>@up.TotalCost.ToString("F2")</td>
-                        </tr>
+                        <a asp-controller="ServiceTaskPart"
+                           asp-action="Add"
+                           asp-route-serviceTaskId="@task.Id"
+                           class="btn btn-sm btn-success">
+                            Dodaj część
+                        </a>
                     }
-                    </tbody>
-                </table>
-            }
-            else
-            {
-                <p>Brak użytych części.</p>
-            }
-        </div>
-    </div>
-}
+                </div>
+                <div class="card-body">
+                    @if (task.UsedParts.Any())
+                    {
+                        <table class="table table-sm table-bordered table-hover align-middle mb-0">
+                            <thead class="table-secondary">
+                            <tr>
+                                <th>Część</th>
+                                <th>Ilość</th>
+                                <th>Cena jedn. (PLN)</th>
+                                <th>Łączny koszt (PLN)</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            @foreach (var up in task.UsedParts)
+                            {
+                                <tr>
+                                    <td>@up.Part?.Name</td>
+                                    <td>@up.Quantity</td>
+                                    <td>@up.Part?.UnitPrice.ToString("F2")</td>
+                                    <td>@up.TotalCost.ToString("F2")</td>
+                                </tr>
+                            }
+                            </tbody>
+                        </table>
+                    }
+                    else
+                    {
+                        <p class="fst-italic text-muted mb-0">Brak użytych części.</p>
+                    }
+                </div>
+            </div>
+        }
+    }
 
-// **Sumowanie kosztów całego zlecenia**:
-<div class="alert alert-info">
     @{
         decimal laborSum = Model.ServiceTasks.Sum(t => t.LaborCost);
         decimal partsSum = Model.ServiceTasks.Sum(t => t.UsedParts.Sum(up => up.TotalCost));
         decimal totalOrderCost = laborSum + partsSum;
     }
-    <p><strong>Suma robocizny:</strong> @laborSum.ToString("C")</p>
-    <p><strong>Suma części:</strong> @partsSum.ToString("C")</p>
-    <hr />
-    <p><strong>Całkowity koszt zlecenia:</strong> @totalOrderCost.ToString("C")</p>
-</div>
+    <div class="alert alert-info fs-5">
+        <p><strong>Suma robocizny:</strong> @laborSum.ToString("C")</p>
+        <p><strong>Suma części:</strong> @partsSum.ToString("C")</p>
+        <hr />
+        <p class="fw-bold fs-4">Całkowity koszt zlecenia: @totalOrderCost.ToString("C")</p>
+    </div>
 
-<p>
-    @if (isMechanic)
-    {
-        <a asp-controller="Mechanik"
-           asp-action="MyOrders"
-           class="btn btn-secondary">
-            ← Wróć do moich zleceń
-        </a>
-    }
-    else
-    {
-        <a asp-controller="ServiceOrder"
-           asp-action="OrdersForVehicle"
-           asp-route-vehicleId="@Model.VehicleId"
-           class="btn btn-secondary">
-            ← Wróć do listy zleceń pojazdu
-        </a>
-    }
-</p>
-
-
-<!-- <h3>Czynności serwisowe</h3>
-
-<p>
-    <a asp-controller="ServiceTask"
-       asp-action="Add"
-       asp-route-orderId="@Model.Id"
-       class="btn btn-sm btn-success mb-2">
-        Dodaj czynność
-    </a>
-</p>
-
-@if (Model.ServiceTasks.Any())
-{
-    <table class="table table-bordered">
-        <thead>
-        <tr><th>Opis</th><th>Koszt robocizny</th></tr>
-        </thead>
-        <tbody>
-        @foreach(var t in Model.ServiceTasks)
+    <p>
+        @if (isMechanic)
         {
-            <tr>
-                <td>@t.Description</td>
-                <td>@t.LaborCost.ToString("F2")</td>
-            </tr>
+            <a asp-controller="Mechanik" asp-action="MyOrders" class="btn btn-secondary">
+                <i class="bi bi-arrow-left me-2"></i> Wróć do moich zleceń
+            </a>
         }
-        </tbody>
-    </table>
-}
-else
-{
-    <p>Brak dodanych czynności.</p>
-}
--->
+        else
+        {
+            <a asp-controller="ServiceOrder" asp-action="OrdersForVehicle" asp-route-vehicleId="@Model.VehicleId" class="btn btn-secondary">
+                <i class="bi bi-arrow-left me-2"></i> Wróć do listy zleceń pojazdu
+            </a>
+        }
+    </p>
+</div>
