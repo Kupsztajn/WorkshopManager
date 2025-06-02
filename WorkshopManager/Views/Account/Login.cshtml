@@ -4,25 +4,24 @@
     <div class="row justify-content-center">
         <div class="col-md-5 col-lg-4">
             <div class="card mt-5 shadow-sm">
-                <div class="card-body">
-                    <h3 class="card-title text-center mb-4">Logowanie</h3>
+                <div class="card-body text-center">
+                    <!-- Logo -->
+                    <div class="mb-4">
+                        <img src="~/images/logo.png" alt="Workshop Manager Logo" class="img-fluid" style="max-height: 80px;" />
+                    </div>
+
+                    <h3 class="card-title mb-4">Logowanie</h3>
 
                     <form asp-action="Login" method="post">
                         <div asp-validation-summary="All" class="alert alert-danger"></div>
 
-                        <div class="mb-3 text-center">
-                            <a asp-controller="Account" asp-action="Register" class="btn btn-outline-secondary btn-sm">
-                                Nie masz konta? Zarejestruj się
-                            </a>
-                        </div>
-
-                        <div class="mb-3">
+                        <div class="mb-3 text-start">
                             <label asp-for="Username" class="form-label"></label>
                             <input asp-for="Username" class="form-control" placeholder="Wpisz nazwę użytkownika" />
                             <span asp-validation-for="Username" class="text-danger small"></span>
                         </div>
 
-                        <div class="mb-4">
+                        <div class="mb-4 text-start">
                             <label asp-for="Password" class="form-label"></label>
                             <input asp-for="Password" type="password" class="form-control" placeholder="Podaj hasło" />
                             <span asp-validation-for="Password" class="text-danger small"></span>
@@ -36,7 +35,7 @@
             </div>
 
             <div class="text-center mt-3">
-                <small class="text-muted">© Szarlotka – Wszystkie prawa zastrzeżone</small>
+                <small class="text-muted">©.NetGroup – Wszystkie prawa zastrzeżone</small>
             </div>
         </div>
     </div>

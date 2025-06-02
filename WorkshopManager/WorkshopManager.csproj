@@ -31,4 +31,8 @@
     <Compile Remove="Services\UserService.cs" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="wwwroot\images\logo.png" />
+  </ItemGroup>
+
 </Project>
