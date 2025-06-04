@@ -6,7 +6,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WorkshopManager.Data;
 using WorkshopManager.Models;
-using WorkshopManager.Models.ViewModels; // jeśli masz CreateUserViewModel
+using WorkshopManager.Models.ViewModels;
+
+// jeśli masz CreateUserViewModel
 
 namespace WorkshopManager.Controllers
 {
@@ -115,9 +117,18 @@ namespace WorkshopManager.Controllers
 
         
         // GET: /Admin/Users
-        public async Task<IActionResult> Users()
+        public async Task<IActionResult> Users(string searchQuery = "")
         {
-            var users = _userManager.Users.ToList();
+            var usersQuery = _userManager.Users.AsQueryable();
+
+            if (!string.IsNullOrEmpty(searchQuery))
+            {
+                usersQuery = usersQuery.Where(u => u.Name.Contains(searchQuery) ||
+                                                   u.Surname.Contains(searchQuery) ||
+                                                   u.Email.Contains(searchQuery));
+            }
+
+            var users = await usersQuery.ToListAsync();
 
             var usersWithRoles = new List<UserWithRolesViewModel>();
 
@@ -136,7 +147,6 @@ namespace WorkshopManager.Controllers
 
             return View(usersWithRoles);
         }
-
         
         // GET: /Admin/EditUserRoles/{userId}
         public async Task<IActionResult> EditUserRoles(string userId)

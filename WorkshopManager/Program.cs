@@ -4,14 +4,12 @@ using Microsoft.EntityFrameworkCore;
 using WorkshopManager.Data;
 using WorkshopManager.Models;
 using WorkshopManager.Services;
-
+using WorkshopManager.Services.Implementations;
+using WorkshopManager.Services.Interfaces;
 namespace WorkshopManager
 {
-    
-    
     public class Program
     {
-
         public static async Task SeedUsersAsync(WebApplication app)
         {
             using var scope = app.Services.CreateScope();
@@ -62,6 +60,8 @@ namespace WorkshopManager
             builder.Services.AddControllersWithViews();
             //builder.Services.AddDbContext<UsersDbContext>(options => options.UseSqlite("Data Source=database.db"));
             
+            
+            
             builder.Services.AddDbContext<UsersDbContext>(options =>
                 options.UseSqlServer("Server=localhost;Database=DbWorkshop;Trusted_Connection=True;TrustServerCertificate=True;"));
             
@@ -82,6 +82,8 @@ namespace WorkshopManager
             {
                 options.LoginPath = "/Account/Login";
             });
+            
+            builder.Services.AddScoped<IMechanicService, MechanicService>();
             
             var app = builder.Build();
             
