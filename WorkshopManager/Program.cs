@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -59,11 +60,27 @@ namespace WorkshopManager
             // Add services to the container.
             builder.Services.AddControllersWithViews();
             //builder.Services.AddDbContext<UsersDbContext>(options => options.UseSqlite("Data Source=database.db"));
+
+            string connectionString;
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                connectionString =
+                    "Server=localhost;Database=DbWorkshop;Trusted_Connection=True;TrustServerCertificate=True;";
+            }
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            {
+                connectionString =
+                    "Server=localhost,1433;Database=DbWorkshop;User Id=SA;Password=YourStrong_Passw0rd;TrustServerCertificate=True;";
+            }
+            else
+            {
+                throw new Exception("Platform not supported");
+            }
             
             
             
             builder.Services.AddDbContext<UsersDbContext>(options =>
-                options.UseSqlServer("Server=localhost;Database=DbWorkshop;Trusted_Connection=True;TrustServerCertificate=True;"));
+                options.UseSqlServer(connectionString, sqlserverOptions => sqlserverOptions.EnableRetryOnFailure()));
             
             //builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                 //.AddCookie(options => { options.LoginPath = "/Account/Login"; });
