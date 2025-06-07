@@ -1,0 +1,87 @@
+@using System.Globalization
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@model WorkshopManager.Models.ViewModels.ReportViewModel
+
+<div class="container mt-4">
+    <h2>Raport kosztów napraw dla: @Model.Client.Name @Model.Client.Surname </h2>
+
+    <form method="get" asp-action="Report" asp-controller="Report" class="row g-3 mb-4">
+        <input type="hidden" name="clientId" value="@Model.Client.Id" />
+
+        <div class="col-md-3">
+            <label class="form-label">Miesiąc</label>
+            <select class="form-select" name="month">
+                <option value="">Wszystkie</option>
+                @for (int m = 1; m <= 12; m++)
+                {
+                    if (Model.SelectedMonth == m)
+                    {
+                        <option value="@m" selected>@CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(m)</option>
+                    }
+                    else
+                    {
+                        <option value="@m">@CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(m)</option>
+                    }
+                }
+            </select>
+        </div>
+
+        <div class="col-md-4">
+            <label class="form-label">Pojazd</label>
+            <select class="form-select" name="vehicleId">
+                <option value="">Wszystkie</option>
+                @foreach (var v in Model.Vehicles)
+                {
+                    if (Model.SelectedVehicleId == v.Id)
+                    {
+                        <option value="@v.Id" selected>@v.Brand @v.Model (@v.Registration)</option>
+                    }
+                    else
+                    {
+                        <option value="@v.Id">@v.Brand @v.Model (@v.Registration)</option>
+                    }
+                }
+            </select>
+        </div>
+
+        <div class="col-md-2 d-flex align-items-end">
+            <button type="submit" class="btn btn-primary">Filtruj</button>
+        </div>
+    </form>
+    
+    <table class="table table-bordered mt-4">
+        <thead class="table-light">
+        <tr>
+            <th>Data</th>
+            <th>Pojazd</th>
+            <th>Koszt robocizny</th>
+            <th>Koszt części</th>
+            <th>Razem</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var item in Model.ReportItems)
+        {
+            <tr>
+                <td>@item.Date.ToShortDateString()</td>
+                <td>@item.Vehicle.Registration</td>
+                <td>@item.LaborCost.ToString("C")</td>
+                <td>@item.PartsCost.ToString("C")</td>
+                <td>@((item.LaborCost + item.PartsCost).ToString("C"))</td>
+            </tr>
+        }
+        </tbody>
+        <tfoot class="table-secondary">
+        <tr>
+            <th colspan="4" class="text-end">Łączny koszt:</th>
+            <th>@Model.TotalCost.ToString("C")</th>
+        </tr>
+        </tfoot>
+    </table>
+
+    <!--
+    <a class="btn btn-outline-primary" asp-action="GeneratePdf" asp-route-customerId="@Model.Client.Id">
+        Eksportuj do PDF
+    </a>
+    -->
+</div>

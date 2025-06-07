@@ -37,6 +37,9 @@
                             <a asp-action="ClientVehicles" asp-route-clientId="@client.Id" class="btn btn-sm btn-secondary">
                                 <i class="bi bi-car-front-fill me-1"></i> Pojazdy klienta
                             </a>
+                            <a asp-controller="Report" asp-action="Report" asp-route-clientId="@client.Id" class="btn btn-sm btn-secondary">
+                                <i class="bi bi-car-front-fill me-1"></i> Raport
+                            </a>
                         </td>
                     </tr>
                 }
