@@ -51,12 +51,23 @@
 
     <h3 class="mb-3">Czynności serwisowe</h3>
 
+    <p>
+        <a asp-controller="ServiceTask"
+           asp-action="Add"
+           asp-route-orderId="@Model.Id"
+           class="btn btn-sm btn-success mb-2">
+            Dodaj czynność
+        </a>
+    </p>
+    
     @if (!Model.ServiceTasks.Any())
     {
         <div class="alert alert-warning">Brak wykonanych czynności serwisowych dla tego zlecenia.</div>
     }
     else
     {
+        
+        
         @foreach (var task in Model.ServiceTasks)
         {
             <div class="card mb-4 shadow-sm">
