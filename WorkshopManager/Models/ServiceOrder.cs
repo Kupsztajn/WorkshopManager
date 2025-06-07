@@ -26,4 +26,6 @@ public class ServiceOrder
     public ApplicationUser Mechanic { get; set; }
     
     public ICollection<ServiceTask> ServiceTasks { get; set; } = new List<ServiceTask>();
+    
+    public ICollection<Comment> Comments { get; set; } = new List<Comment>();
 }

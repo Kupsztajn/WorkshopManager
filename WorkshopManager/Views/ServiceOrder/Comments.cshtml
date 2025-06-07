@@ -1,0 +1,39 @@
+@model WorkshopManager.Models.ServiceOrder
+
+@{
+    ViewData["Title"] = $"Komentarze do zlecenia {Model.Id}";
+}
+
+<div class="container mt-4">
+    <!-- Display Comments -->
+    @if (Model.Comments.Any())
+{
+    <ul class="list-group mb-4">
+        @foreach (var comment in Model.Comments.OrderByDescending(c => c.Timestamp))
+    {
+        <li class="list-group-item">
+            <strong>@comment.Author</strong>
+            <span class="text-muted small float-end">@comment.Timestamp.ToString("g")</span>
+            <p class="mb-0">@comment.Content</p>
+            </li>
+    }
+    </ul>
+}
+else
+{
+    <p class="text-muted">Brak komentarzy</p>
+}
+
+<hr />
+
+    <!-- Add Comment Form -->
+    <h4>Dodaj komentarz</h4>
+    <form asp-action="Comments" method="post">
+    <input type="hidden" name="serviceOrderId" value="@Model.Id" />
+    <div class="mb-3">
+    <label for="content" class="form-label">Komentarz</label>
+    <textarea class="form-control" id="content" name="Content" rows="3" required></textarea>
+    </div>
+    <button type="submit" class="btn btn-primary">Dodaj komentarz</button>
+    </form>
+    </div>

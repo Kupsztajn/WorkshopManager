@@ -228,6 +228,152 @@ namespace WorkshopManager.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
+            modelBuilder.Entity("WorkshopManager.Models.Comment", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Author")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
+                    b.Property<int>("ServiceOrderId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("Timestamp")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ServiceOrderId");
+
+                    b.ToTable("Comments");
+                });
+
+            modelBuilder.Entity("WorkshopManager.Models.Part", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<decimal>("UnitPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Parts");
+                });
+
+            modelBuilder.Entity("WorkshopManager.Models.ServiceOrder", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime?>("CompletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("MechanicId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("nvarchar(max)")
+                        .HasDefaultValue("Nowe");
+
+                    b.Property<int>("VehicleId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MechanicId");
+
+                    b.HasIndex("VehicleId");
+
+                    b.ToTable("ServiceOrders");
+                });
+
+            modelBuilder.Entity("WorkshopManager.Models.ServiceTask", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<decimal>("LaborCost")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("ServiceOrderId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ServiceOrderId");
+
+                    b.ToTable("ServiceTasks");
+                });
+
+            modelBuilder.Entity("WorkshopManager.Models.UsedPart", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("PartId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ServiceTaskId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("TotalCost")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PartId");
+
+                    b.HasIndex("ServiceTaskId");
+
+                    b.ToTable("UsedParts");
+                });
+
             modelBuilder.Entity("WorkshopManager.Models.Vehicle", b =>
                 {
                     b.Property<int>("Id")
@@ -243,6 +389,10 @@ namespace WorkshopManager.Migrations
                     b.Property<string>("ClientId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("ImageUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Model")
                         .IsRequired()
@@ -317,6 +467,66 @@ namespace WorkshopManager.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("WorkshopManager.Models.Comment", b =>
+                {
+                    b.HasOne("WorkshopManager.Models.ServiceOrder", "ServiceOrder")
+                        .WithMany("Comments")
+                        .HasForeignKey("ServiceOrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ServiceOrder");
+                });
+
+            modelBuilder.Entity("WorkshopManager.Models.ServiceOrder", b =>
+                {
+                    b.HasOne("WorkshopManager.Models.ApplicationUser", "Mechanic")
+                        .WithMany()
+                        .HasForeignKey("MechanicId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("WorkshopManager.Models.Vehicle", "Vehicle")
+                        .WithMany("ServiceOrders")
+                        .HasForeignKey("VehicleId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Mechanic");
+
+                    b.Navigation("Vehicle");
+                });
+
+            modelBuilder.Entity("WorkshopManager.Models.ServiceTask", b =>
+                {
+                    b.HasOne("WorkshopManager.Models.ServiceOrder", "ServiceOrder")
+                        .WithMany("ServiceTasks")
+                        .HasForeignKey("ServiceOrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ServiceOrder");
+                });
+
+            modelBuilder.Entity("WorkshopManager.Models.UsedPart", b =>
+                {
+                    b.HasOne("WorkshopManager.Models.Part", "Part")
+                        .WithMany()
+                        .HasForeignKey("PartId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("WorkshopManager.Models.ServiceTask", "ServiceTask")
+                        .WithMany("UsedParts")
+                        .HasForeignKey("ServiceTaskId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Part");
+
+                    b.Navigation("ServiceTask");
+                });
+
             modelBuilder.Entity("WorkshopManager.Models.Vehicle", b =>
                 {
                     b.HasOne("WorkshopManager.Models.ApplicationUser", "Client")
@@ -326,6 +536,23 @@ namespace WorkshopManager.Migrations
                         .IsRequired();
 
                     b.Navigation("Client");
+                });
+
+            modelBuilder.Entity("WorkshopManager.Models.ServiceOrder", b =>
+                {
+                    b.Navigation("Comments");
+
+                    b.Navigation("ServiceTasks");
+                });
+
+            modelBuilder.Entity("WorkshopManager.Models.ServiceTask", b =>
+                {
+                    b.Navigation("UsedParts");
+                });
+
+            modelBuilder.Entity("WorkshopManager.Models.Vehicle", b =>
+                {
+                    b.Navigation("ServiceOrders");
                 });
 #pragma warning restore 612, 618
         }

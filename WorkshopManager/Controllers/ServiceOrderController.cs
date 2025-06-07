@@ -22,6 +22,10 @@ public class ServiceOrderController :  Controller
 
     public async Task<IActionResult> Details(int id)
     {
+        if (User.Identity.IsAuthenticated == false)
+        {
+            return Unauthorized();
+        }
         var order = await _context.ServiceOrders
             .Include(o => o.Vehicle)
             .Include(o => o.Mechanic)
@@ -47,9 +51,40 @@ public class ServiceOrderController :  Controller
         ViewBag.VehicleId = vehicleId;
         return View(orders);
     }
-    
+    [HttpGet]
+    public IActionResult Comments(int id)
+    {
+        if (User.Identity.IsAuthenticated == false)
+        {
+            return Unauthorized();
+        }
+        var order = _context.ServiceOrders
+            .Include(o => o.Comments) // assuming there's a navigation property
+            .FirstOrDefault(o => o.Id == id);
 
-    
+        if (order == null) return NotFound();
+
+        return View(order); // This will look for Views/ServiceOrder/Comments.cshtml
+    }
+
+    [HttpPost]
+    public IActionResult Comments(int serviceOrderId, string content)
+    {
+        if (User.Identity.IsAuthenticated == false)
+        {
+            return Unauthorized();
+        }
+        Comment comment = new Comment();
+        comment.Content = content;
+        comment.Author = User.Identity.Name;
+        comment.Timestamp = DateTime.Now;
+        ServiceOrder serviceOrder = _context.ServiceOrders.Find(serviceOrderId);
+        if (serviceOrder == null) return NotFound();
+        serviceOrder.Comments.Add(comment);
+        _context.SaveChanges();
+        return RedirectToAction("Comments", new { id = serviceOrderId });
+    }
+
     //GET
     [HttpGet]
     public async Task<IActionResult> Create(int id)

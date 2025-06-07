@@ -16,6 +16,7 @@ namespace WorkshopManager.Data
         public DbSet<ServiceTask> ServiceTasks { get; set; }
         public DbSet<UsedPart> UsedParts { get; set; }
         public DbSet<Part> Parts { get; set; }
+        public DbSet<Comment> Comments { get; set; }
         
         protected override void OnModelCreating(ModelBuilder builder)
         {
