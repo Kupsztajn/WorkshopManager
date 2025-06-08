@@ -18,4 +18,9 @@ public class DatabaseService : IDatabaseService
     {
         return await _context.Vehicles.ToListAsync();
     }
+
+    public async Task<List<ServiceOrder>> GetServiceOrdersAsync()
+    {
+        return await _context.ServiceOrders.ToListAsync();
+    }
 }
