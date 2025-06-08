@@ -73,6 +73,8 @@ namespace WorkshopManager
 
                 builder.Services.AddHostedService<OpenOrderReportBackgroundService>();
                 
+                builder.Services.AddScoped<IDatabaseService, DatabaseService>();
+                
                 string connectionString;
                 if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                 {

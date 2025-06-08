@@ -7,6 +7,8 @@ using Microsoft.EntityFrameworkCore;
 using WorkshopManager.Data;
 using WorkshopManager.Models;
 using WorkshopManager.Models.ViewModels;
+using WorkshopManager.Services.Implementations;
+using WorkshopManager.Services.Interfaces;
 
 // jeśli masz CreateUserViewModel
 
@@ -17,12 +19,15 @@ namespace WorkshopManager.Controllers
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
-        private readonly UsersDbContext _context;
-        public AdminController(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, UsersDbContext context)
+        
+        private readonly IDatabaseService _databaseService;
+        public AdminController(UserManager<ApplicationUser> userManager, 
+            RoleManager<IdentityRole> roleManager, 
+            IDatabaseService databaseService)
         {
             _userManager = userManager;
             _roleManager = roleManager;
-            _context = context;
+            _databaseService = databaseService;
         }
         
         [HttpGet]
@@ -205,9 +210,10 @@ namespace WorkshopManager.Controllers
             var client = await _userManager.FindByIdAsync(clientId);
             if (client == null) return NotFound();
 
-            var vehicles = await _context.Vehicles
+            var vehicles = await _databaseService.GetVehiclesAsync();
+                vehicles = vehicles
                 .Where(v => v.ClientId == clientId)
-                .ToListAsync();
+                .ToList();
 
             ViewBag.ClientName = $"{client.Name} {client.Surname}";
             return View(vehicles);
