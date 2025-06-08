@@ -5,6 +5,8 @@ VisualStudioVersion = 17.9.34728.123
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WorkshopManager", "WorkshopManager\WorkshopManager.csproj", "{46EAC7CA-FD4C-4BA8-922D-5CA40414A287}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LoadTests", "LoadTests\LoadTests.csproj", "{BD16B92C-ED86-4BE7-B47E-A9326892FDEF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{46EAC7CA-FD4C-4BA8-922D-5CA40414A287}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{46EAC7CA-FD4C-4BA8-922D-5CA40414A287}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{46EAC7CA-FD4C-4BA8-922D-5CA40414A287}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BD16B92C-ED86-4BE7-B47E-A9326892FDEF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BD16B92C-ED86-4BE7-B47E-A9326892FDEF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BD16B92C-ED86-4BE7-B47E-A9326892FDEF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BD16B92C-ED86-4BE7-B47E-A9326892FDEF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,0 +1,26 @@
+test info
+test suite: nbomber_default_test_suite_name
+test name: nbomber_default_test_name
+session id: 2025-06-08_16.41.24_session_87f899fb
+
+scenario: vehicles_api_test
+  - ok count: 100
+  - fail count: 0
+  - all data: 0 MB
+  - duration: 00:00:02
+
+load simulations: 
+  - inject_random, minRate: 50, maxRate: 51, interval: 00:00:01, during: 00:00:02
+
++-------------------------+-----------------------------------------------------+
+| step                    | ok stats                                            |
++-------------------------+-----------------------------------------------------+
+| name                    | global information                                  |
++-------------------------+-----------------------------------------------------+
+| request count           | all = 100, ok = 100, RPS = 50                       |
++-------------------------+-----------------------------------------------------+
+| latency (ms)            | min = 1.76, mean = 5.58, max = 17.28, StdDev = 2.38 |
++-------------------------+-----------------------------------------------------+
+| latency percentile (ms) | p50 = 6.35, p75 = 6.91, p95 = 8.14, p99 = 9.22      |
++-------------------------+-----------------------------------------------------+
+
