@@ -71,6 +71,8 @@ namespace WorkshopManager
                 builder.Services.AddControllersWithViews();
                 //builder.Services.AddDbContext<UsersDbContext>(options => options.UseSqlite("Data Source=database.db"));
 
+                builder.Services.AddHostedService<OpenOrderReportBackgroundService>();
+                
                 string connectionString;
                 if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                 {
