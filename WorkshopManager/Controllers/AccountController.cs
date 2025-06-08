@@ -10,11 +10,14 @@ namespace WorkshopManager.Controllers
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly ILogger<AccountController> _logger;
 
-        public AccountController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager)
+        public AccountController(UserManager<ApplicationUser> userManager, 
+            SignInManager<ApplicationUser> signInManager, ILogger<AccountController> logger)
         {
             _userManager = userManager;
             _signInManager = signInManager;
+            _logger = logger;
         }
 
         [HttpGet]
@@ -65,6 +68,7 @@ namespace WorkshopManager.Controllers
             var result = await _userManager.CreateAsync(user, model.Password);
             if (result.Succeeded)
             {
+                _logger.LogInformation("User created a new account.");
                 var errors = string.Join(", ", result.Errors.Select(e => e.Description));
                 await _userManager.AddToRoleAsync(user, model.Role);
                 await _signInManager.SignInAsync(user, isPersistent: false);
@@ -72,6 +76,7 @@ namespace WorkshopManager.Controllers
             }
             else
             {
+                _logger.LogInformation("User failed to create a new account.");
                 foreach (var error in result.Errors)
                     ModelState.AddModelError("", error.Description);
                 return View(model); // Pokaż widok z błędami
