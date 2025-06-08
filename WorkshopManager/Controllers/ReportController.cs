@@ -22,6 +22,12 @@ public class ReportController : Controller
     [HttpGet]
     public IActionResult Report(string clientId, int? month, int? vehicleId)
     {
+
+        if (!(User.IsInRole("Admin") || User.IsInRole("Recepcjonista")))
+        {
+            return Unauthorized();
+        }
+        
         var orders = _context.ServiceOrders
             .Include(o => o.Vehicle)
             .Include(o => o.ServiceTasks)
@@ -62,6 +68,58 @@ public class ReportController : Controller
             SelectedMonth = month,
             SelectedVehicleId = vehicleId,
             Vehicles = _context.Vehicles.Where(v => v.ClientId == clientId).ToList()
+        };
+
+        return View(vm);
+    }
+
+    [HttpGet]
+    public IActionResult MonthlyReport(int? month, int? year)
+    {
+        
+        if (!User.IsInRole("Admin"))
+        {
+            return Unauthorized();
+        }
+
+        if (month is null)
+        {
+            month = DateTime.Now.Month;
+        }
+
+        if (year is null)
+        {
+            year = DateTime.Now.Year;
+        }
+        
+        List<MonthlyReportItem> reportItems = _context.ServiceOrders
+            .Include(o => o.Vehicle.Client)
+            .Include(o => o.Vehicle)
+            .Include(o => o.ServiceTasks)
+                .ThenInclude(st => st.UsedParts)
+                    .ThenInclude(up => up.Part)
+            .Where(o => o.CreatedAt.Month == month && o.CreatedAt.Year == year)
+            .ToList()
+            .GroupBy(o => new { o.Vehicle.Client, o.Vehicle })
+            .Select(
+                g => new MonthlyReportItem()
+                {
+                    Client = g.Key.Client,
+                    Vehicle = g.Key.Vehicle,
+                    TotalCost = g.Sum(o => o.ServiceTasks.Sum(st => st.LaborCost + st.UsedParts
+                            .Sum(up => up.TotalCost)
+                        )
+                    ),
+                    OrderCount = g.Count()
+                }
+            ).ToList();
+        
+        MonthlyReportViewModel vm = new MonthlyReportViewModel()
+        {
+            Month = month.Value,
+            Year = year.Value,
+            ReportItems = reportItems,
+            TotalCost = reportItems.Sum(s => s.TotalCost)
         };
 
         return View(vm);

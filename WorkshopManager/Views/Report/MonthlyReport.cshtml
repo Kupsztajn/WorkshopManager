@@ -1,0 +1,81 @@
+@using System.Globalization
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@model WorkshopManager.Models.ViewModels.MonthlyReportViewModel
+
+<form method="get" asp-action="MonthlyReport" asp-controller="Report" class="row g-3 mb-4">
+    <div class="col-md-3">
+        <label class="form-label">Miesiąc</label>
+        <select class="form-select" name="month">
+            @for (int m = 1; m <= 12; m++)
+            {
+                if (Model.Month == m)
+                {
+                    <option value="@m" selected>@CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(m)</option>
+                }
+                else
+                {
+                    <option value="@m">@CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(m)</option>
+                }
+            }
+        </select>
+    </div>
+
+    <div class="col-md-4">
+        <label class="form-label">Rok</label>
+        <select class="form-select" name="year">
+            @for (int y = @DateTime.Now.Year; y >= 2018; y--)
+            {
+                if (Model.Year == y)
+                {
+                    <option value="@y" selected>@y</option>
+                }
+                else
+                {
+                    <option value="@y">@y</option>
+                }
+            }
+        </select>
+    </div>
+
+    <div class="col-md-2 d-flex align-items-end">
+        <button type="submit" class="btn btn-primary">Wybierz miesiąc</button>
+    </div>
+</form>
+
+<div class="container mt-4">
+    <h2>Raport kosztów napraw dla @CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(@Model.Month) @Model.Year </h2>
+    
+    <table class="table table-bordered mt-4">
+        <thead class="table-light">
+        <tr>
+            <th>Klient</th>
+            <th>Pojazd</th>
+            <th>Koszt</th>
+            <th>L. Napraw</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var item in Model.ReportItems)
+        {
+            <tr>
+                <td>@item.Client.Name @item.Client.Surname</td>
+                <td>@item.Vehicle.Registration</td>
+                <td>@item.TotalCost.ToString("C")</td>
+                <td>@item.OrderCount</td>
+            </tr>
+        }
+        </tbody>
+        <tfoot class="table-secondary">
+        <tr>
+            <th colspan="3" class="text-end">Łączny koszt:</th>
+            <th>@Model.TotalCost.ToString("C")</th>
+        </tr>
+        </tfoot>
+    </table>
+
+    <!--
+    <a class="btn btn-outline-primary" asp-action="GeneratePdf">
+        Eksportuj do PDF
+    </a>
+    -->
+</div>
