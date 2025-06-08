@@ -1,9 +1,12 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using QuestPDF.Fluent;
+using QuestPDF.Infrastructure;
 using WorkshopManager.Data;
 using WorkshopManager.Models;
 using WorkshopManager.Models.ViewModels;
+using WorkshopManager.Pdf;
 
 namespace WorkshopManager.Controllers;
 
@@ -73,6 +76,41 @@ public class ReportController : Controller
         return View(vm);
     }
 
+    private MonthlyReportViewModel GetMonthlyReportViewModel(int month, int year)
+    {
+        List<MonthlyReportItem> reportItems = _context.ServiceOrders
+            .Include(o => o.Vehicle.Client)
+            .Include(o => o.Vehicle)
+            .Include(o => o.ServiceTasks)
+            .ThenInclude(st => st.UsedParts)
+            .ThenInclude(up => up.Part)
+            .Where(o => o.CreatedAt.Month == month && o.CreatedAt.Year == year)
+            .ToList()
+            .GroupBy(o => new { o.Vehicle.Client, o.Vehicle })
+            .Select(
+                g => new MonthlyReportItem()
+                {
+                    Client = g.Key.Client,
+                    Vehicle = g.Key.Vehicle,
+                    TotalCost = g.Sum(o => o.ServiceTasks.Sum(st => st.LaborCost + st.UsedParts
+                            .Sum(up => up.TotalCost)
+                        )
+                    ),
+                    OrderCount = g.Count()
+                }
+            ).ToList();
+        
+        MonthlyReportViewModel vm = new MonthlyReportViewModel()
+        {
+            Month = month,
+            Year = year,
+            ReportItems = reportItems,
+            TotalCost = reportItems.Sum(s => s.TotalCost)
+        };
+
+        return vm;
+    }
+    
     [HttpGet]
     public IActionResult MonthlyReport(int? month, int? year)
     {
@@ -92,36 +130,19 @@ public class ReportController : Controller
             year = DateTime.Now.Year;
         }
         
-        List<MonthlyReportItem> reportItems = _context.ServiceOrders
-            .Include(o => o.Vehicle.Client)
-            .Include(o => o.Vehicle)
-            .Include(o => o.ServiceTasks)
-                .ThenInclude(st => st.UsedParts)
-                    .ThenInclude(up => up.Part)
-            .Where(o => o.CreatedAt.Month == month && o.CreatedAt.Year == year)
-            .ToList()
-            .GroupBy(o => new { o.Vehicle.Client, o.Vehicle })
-            .Select(
-                g => new MonthlyReportItem()
-                {
-                    Client = g.Key.Client,
-                    Vehicle = g.Key.Vehicle,
-                    TotalCost = g.Sum(o => o.ServiceTasks.Sum(st => st.LaborCost + st.UsedParts
-                            .Sum(up => up.TotalCost)
-                        )
-                    ),
-                    OrderCount = g.Count()
-                }
-            ).ToList();
-        
-        MonthlyReportViewModel vm = new MonthlyReportViewModel()
-        {
-            Month = month.Value,
-            Year = year.Value,
-            ReportItems = reportItems,
-            TotalCost = reportItems.Sum(s => s.TotalCost)
-        };
+        MonthlyReportViewModel vm = GetMonthlyReportViewModel(month.Value, year.Value);
 
         return View(vm);
+    }
+
+    public IActionResult GemerateMonthlyReportPdf(int month, int year)
+    {
+        MonthlyReportViewModel vm = GetMonthlyReportViewModel(month, year);
+
+        MonthlyReportDocument doc = new MonthlyReportDocument(vm);
+        QuestPDF.Settings.License = LicenseType.Community;
+        byte[] pdfBytes = doc.GeneratePdf();
+        
+        return File(pdfBytes, "application/pdf", $"{month}-{year}.pdf");
     }
 }
