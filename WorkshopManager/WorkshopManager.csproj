@@ -24,6 +24,7 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.Identity.Client" Version="4.61.3" />
+    <PackageReference Include="NLog.Web.AspNetCore" Version="5.5.0" />
     <PackageReference Include="QuestPDF" Version="2025.5.1" />
   </ItemGroup>
 

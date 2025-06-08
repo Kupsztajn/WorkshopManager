@@ -2,6 +2,8 @@ using System.Runtime.InteropServices;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using NLog;
+using NLog.Web;
 using WorkshopManager.Data;
 using WorkshopManager.Models;
 using WorkshopManager.Services;
@@ -55,84 +57,99 @@ namespace WorkshopManager
         }
         public static async Task Main(string[] args)
         {
-            var builder = WebApplication.CreateBuilder(args);
+            Logger logger = LogManager.Setup().LoadConfigurationFromFile("nlog.config").GetCurrentClassLogger();
 
-            // Add services to the container.
-            builder.Services.AddControllersWithViews();
-            //builder.Services.AddDbContext<UsersDbContext>(options => options.UseSqlite("Data Source=database.db"));
+            try
+            {
+                logger.Debug("init main");
+                var builder = WebApplication.CreateBuilder(args);
 
-            string connectionString;
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            {
-                connectionString =
-                    "Server=localhost;Database=DbWorkshop;Trusted_Connection=True;TrustServerCertificate=True;";
-            }
-            else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-            {
-                connectionString =
-                    "Server=localhost,1433;Database=DbWorkshop;User Id=SA;Password=YourStrong_Passw0rd;TrustServerCertificate=True;";
-            }
-            else
-            {
-                throw new Exception("Platform not supported");
-            }
-            
-            
-            
-            builder.Services.AddDbContext<UsersDbContext>(options =>
-                options.UseSqlServer(connectionString, sqlserverOptions => sqlserverOptions.EnableRetryOnFailure()));
-            
-            //builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-                //.AddCookie(options => { options.LoginPath = "/Account/Login"; });
-            builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+                builder.Logging.ClearProviders();
+                builder.Host.UseNLog();
+
+                // Add services to the container.
+                builder.Services.AddControllersWithViews();
+                //builder.Services.AddDbContext<UsersDbContext>(options => options.UseSqlite("Data Source=database.db"));
+
+                string connectionString;
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                 {
-                    options.Password.RequireDigit = false;
-                    options.Password.RequiredLength = 6;
-                    options.Password.RequireNonAlphanumeric = false;
-                    options.Password.RequireUppercase = false;
-                    options.Password.RequireLowercase = false;
-                })
-                .AddEntityFrameworkStores<UsersDbContext>()
-                .AddDefaultTokenProviders();
+                    connectionString =
+                        "Server=localhost;Database=DbWorkshop;Trusted_Connection=True;TrustServerCertificate=True;";
+                }
+                else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+                {
+                    connectionString =
+                        "Server=localhost,1433;Database=DbWorkshop;User Id=SA;Password=YourStrong_Passw0rd;TrustServerCertificate=True;";
+                }
+                else
+                {
+                    throw new Exception("Platform not supported");
+                }
 
-            builder.Services.ConfigureApplicationCookie(options =>
-            {
-                options.LoginPath = "/Account/Login";
-            });
-            
-            builder.Services.AddScoped<IMechanicService, MechanicService>();
-            
-            var app = builder.Build();
-            
-            await SeedUsersAsync(app);
 
-            
-            using (var scope = app.Services.CreateScope())
-            {
-                var usersContext = scope.ServiceProvider.GetRequiredService<UsersDbContext>();
-                usersContext.Database.EnsureCreated();
+
+                builder.Services.AddDbContext<UsersDbContext>(options =>
+                    options.UseSqlServer(connectionString,
+                        sqlserverOptions => sqlserverOptions.EnableRetryOnFailure()));
+
+                //builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+                //.AddCookie(options => { options.LoginPath = "/Account/Login"; });
+                builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+                    {
+                        options.Password.RequireDigit = false;
+                        options.Password.RequiredLength = 6;
+                        options.Password.RequireNonAlphanumeric = false;
+                        options.Password.RequireUppercase = false;
+                        options.Password.RequireLowercase = false;
+                    })
+                    .AddEntityFrameworkStores<UsersDbContext>()
+                    .AddDefaultTokenProviders();
+
+                builder.Services.ConfigureApplicationCookie(options => { options.LoginPath = "/Account/Login"; });
+
+                builder.Services.AddScoped<IMechanicService, MechanicService>();
+
+                var app = builder.Build();
+
+                await SeedUsersAsync(app);
+
+
+                using (var scope = app.Services.CreateScope())
+                {
+                    var usersContext = scope.ServiceProvider.GetRequiredService<UsersDbContext>();
+                    usersContext.Database.EnsureCreated();
+                }
+
+                // Configure the HTTP request pipeline.
+                if (!app.Environment.IsDevelopment())
+                {
+                    app.UseExceptionHandler("/Home/Error");
+                    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+                    app.UseHsts();
+                }
+
+                app.UseHttpsRedirection();
+                app.UseStaticFiles();
+
+                app.UseRouting();
+                app.UseAuthentication();
+                app.UseAuthorization();
+
+                app.MapControllerRoute(
+                    name: "default",
+                    pattern: "{controller=Home}/{action=Index}/{id?}");
+
+                app.Run();
             }
-
-            // Configure the HTTP request pipeline.
-            if (!app.Environment.IsDevelopment())
+            catch (Exception e)
             {
-                app.UseExceptionHandler("/Home/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-                app.UseHsts();
+                logger.Error(e, "Stopped program because of exception");
             }
-            
-            app.UseHttpsRedirection();
-            app.UseStaticFiles();
-
-            app.UseRouting();
-            app.UseAuthentication();
-            app.UseAuthorization();
-
-            app.MapControllerRoute(
-                name: "default",
-                pattern: "{controller=Home}/{action=Index}/{id?}");
-
-            app.Run();
+            finally
+            {
+                LogManager.Shutdown();
+            }
         }
     }
 }
