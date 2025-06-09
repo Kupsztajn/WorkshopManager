@@ -78,12 +78,12 @@ public class KlientController : Controller
     // Szczegóły zlecenia (lista czynności + części) – tylko do odczytu
     public async Task<IActionResult> OrderDetails(int orderId)
     {
-        // 1) Pobranie użytkownika
+
         var user = await _userManager.GetUserAsync(User);
         if (user == null)
             return Challenge();
 
-        // 2) Wczytujemy konkretne zlecenie z wszystkimi nawigacjami:
+
         var order = await _context.ServiceOrders
             .Include(o => o.Vehicle)
             .Include(o => o.Mechanic)
@@ -95,7 +95,7 @@ public class KlientController : Controller
         if (order == null)
             return NotFound();
 
-        // 3) Sprawdźmy, czy zlecenie należy do jednego z pojazdów tego klienta
+
         if (order.Vehicle.ClientId != user.Id)
             return Forbid();
 

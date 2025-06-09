@@ -77,21 +77,18 @@ public class VehicleController : Controller
         ModelState.Remove("Client");
         ModelState.Remove("ImageUrl");
         if (!ModelState.IsValid) return View(vm);
-
-        // 1) zapisz plik na dysku
+        
         if (vm.Photo != null && vm.Photo.Length > 0)
         {
             var uploads = Path.Combine(_env.WebRootPath, "uploads");
             Directory.CreateDirectory(uploads);
-
-            // nadaj unikalną nazwę
+            
             var fileName = $"{Guid.NewGuid()}{Path.GetExtension(vm.Photo.FileName)}";
             var filePath = Path.Combine(uploads, fileName);
 
             using var stream = System.IO.File.Create(filePath);
             await vm.Photo.CopyToAsync(stream);
-
-            // 2) utwórz Vehicle i ustaw ImageUrl
+            
             var vehicle = new Vehicle {
                 Brand = vm.Brand,
                 Model = vm.Model,
@@ -130,7 +127,7 @@ public class VehicleController : Controller
         // Sprawdź czy klient jest właścicielem pojazdu lub ma rolę Recepcjonista/Admin
         if (User.IsInRole("Klient") && vehicle.ClientId != user.Id)
         {
-            return Forbid(); // lub RedirectToAction("AccessDenied", "Account");
+            return Forbid();
         }
 
         return View(vehicle);

@@ -92,7 +92,7 @@ public class ServiceOrderController :  Controller
         var vehicle = await _context.Vehicles.FindAsync(id);
         if (vehicle == null) return NotFound();
 
-        // Pobierz mechaników do dropdowna
+
         var mechanics = await _userManager.GetUsersInRoleAsync("Mechanik");
         ViewBag.Mechanics = mechanics.Select(m => new SelectListItem 
         { 
@@ -100,7 +100,7 @@ public class ServiceOrderController :  Controller
             Text = m.Name + " " + m.Surname 
         }).ToList();
 
-        // Przekaż do ViewModel VehicleId i może klienta jeśli potrzebujesz
+
         var vm = new ServiceOrderCreateViewModel
         {
             VehicleId = id,
@@ -120,7 +120,6 @@ public class ServiceOrderController :  Controller
     {
         if (!ModelState.IsValid)
         {
-            // przy błędach ponownie załaduj listy
             var clients = await _userManager.GetUsersInRoleAsync("Klient");
             ViewBag.Clients = clients.Select(c => new SelectListItem { Value = c.Id, Text = c.Name + " " + c.Surname }).ToList();
 
@@ -139,8 +138,7 @@ public class ServiceOrderController :  Controller
             ModelState.AddModelError("VehicleId", "Wybrany pojazd nie istnieje");
             return View(model);
         }
-
-        // Utwórz zlecenie
+        
         var order = new ServiceOrder
         {
             VehicleId = model.VehicleId,
@@ -157,7 +155,7 @@ public class ServiceOrderController :  Controller
     
         // GET: /ServiceOrder/EditStatus/5
     // Wyświetla formularz do zmiany statusu
-    [Authorize]  // najpierw weźmy auth, potem sprawdzimy w kodzie, czy ma prawo
+    [Authorize]
     [HttpGet]
     public async Task<IActionResult> EditStatus(int id)
     {
@@ -170,7 +168,7 @@ public class ServiceOrderController :  Controller
         if (order == null)
             return NotFound();
 
-        // 2) Pobierz bieżącego usera
+
         var user = await _userManager.GetUserAsync(User);
         if (user == null)
             return Challenge(); // nie jest zalogowany
@@ -188,7 +186,7 @@ public class ServiceOrderController :  Controller
         {
             OrderId = order.Id,
             CurrentStatus = order.Status,
-            // Dostępne statusy – zwykle pomijamy ten sam, co Current, ale można go zostawić
+            // Dostępne statusy
             StatusesList = new List<string> { "Nowe", "W trakcie", "Zakończone", "Anulowane" }
         };
 

@@ -20,11 +20,11 @@ public class MechanikController : Controller
     // GET: /Recepcjonista
     public async Task<IActionResult> Index()
     {
-        // User.Identity.Name to domyślnie UserName/email
+
         var username = User.Identity.Name;
         var user = await _userManager.FindByNameAsync(username);
             
-        // Przekazujemy imię do widoku np. przez ViewBag
+
         ViewBag.FirstName = user?.Name;
             
         return View();
@@ -33,7 +33,7 @@ public class MechanikController : Controller
     {
         if (string.IsNullOrEmpty(mechanicId))
         {
-            // Jeśli nie podano mechanicId, to spróbuj pobrać Id zalogowanego użytkownika (mechanika)
+
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
                 return Challenge(); // nie zalogowany

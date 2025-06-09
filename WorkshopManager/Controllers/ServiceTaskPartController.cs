@@ -49,8 +49,7 @@ public class ServiceTaskPartController : Controller
                 Text = $"{p.Name} (Cena: {p.UnitPrice:F2} PLN)"
             })
             .ToList();
-
-        // Przekaż nazwę zadania i zlecenia do widoku (opcjonalnie)
+        
         ViewBag.TaskDescription = task.Description;
         ViewBag.OrderId = task.ServiceOrderId;
         return View(vm);  // szuka Views/ServiceTaskPart/Add.cshtml
@@ -106,11 +105,9 @@ public class ServiceTaskPartController : Controller
             ViewBag.OrderId = task.ServiceOrderId;
             return View(vm);
         }
-
-        // Oblicz koszt części: unit price * quantity
+        
         decimal totalCost = part.UnitPrice * vm.Quantity;
-
-        // Utwórz rekord UsedPart
+        
         var usedPart = new UsedPart
         {
             ServiceTaskId = vm.ServiceTaskId,
@@ -121,14 +118,9 @@ public class ServiceTaskPartController : Controller
 
         _context.UsedParts.Add(usedPart);
         await _context.SaveChangesAsync();
-
-        // Po dodaniu części: przekieruj z powrotem do szczegółów zlecenia (dla tego Mechanika lub Recepcjonisty)
-        // Tutaj zakładam, że mechanik chce zostać w swoich „MyOrders”,
-        // ale zwykle chcemy od razu wrócić do widoku Details zlecenia, bo tam widać wszystkie czynności i części.
-        // Pobierz ID zlecenia:
+        
         int orderId = task.ServiceOrderId;
-
-        // Jeśli mechanik dodaje, prawdopodobnie chce nadal widzieć szczegóły zlecenia:
+        
         return RedirectToAction("Details", "ServiceOrder", new { id = orderId });
     }
 }
